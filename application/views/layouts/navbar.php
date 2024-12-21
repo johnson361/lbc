@@ -14,7 +14,7 @@
                     <a class="nav-link" href="<?= site_url('offerings'); ?>">Offerings</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="<?= site_url('users'); ?>">Users</a>
+                    <a class="nav-link" href="<?= site_url('users'); ?>">Members</a>
                 </li>
             </ul>
         </div>

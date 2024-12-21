@@ -1,6 +1,7 @@
 <!-- application/views/services/index.php -->
 <div class="container mt-3">
     <h2>Services List</h2>
+    <a href="<?= site_url('services/create'); ?>" class="btn btn-primary mb-3">Add New Service</a>
     <table class="table table-bordered">
         <thead>
             <tr>

@@ -27,8 +27,10 @@
             <div class="mb-3">
                 <label for="service_slot" class="form-label">Service Slot</label>
                 <select name="service_slot" id="service_slot" class="form-select" required>
-                    <option value="Morning">Morning</option>
-                    <option value="Evening">Evening</option>
+                    <option value="7 am">7 am</option>
+                    <option value="10 am">10 am</option>
+                    <option value="4 pm">4 pm</option>
+                    <option value="7 pm">7 pm</option>
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>

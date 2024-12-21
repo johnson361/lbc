@@ -1,15 +1,18 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Users extends CI_Controller {
+class Users extends CI_Controller
+{
 
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->load->model('User_model');
     }
 
     // List all users
-    public function index() {
+    public function index()
+    {
         $data['users'] = $this->User_model->get_all_users();
         $data['page_content'] = 'users/index';
         $this->load->view('layouts/navbar', $data);  // Navbar included here
@@ -17,13 +20,14 @@ class Users extends CI_Controller {
     }
 
     // Add a new user
-    public function create() {
+    public function create()
+    {
         if ($this->input->post()) {
             // Get form data
             $data = array(
                 'name' => $this->input->post('name'),
                 'email' => $this->input->post('email'),
-                'phone_number' => $this->input->post('phone_number'),
+                'phone' => $this->input->post('phone'),
             );
             // Insert user into database
             $this->User_model->create_user($data);
@@ -35,13 +39,14 @@ class Users extends CI_Controller {
     }
 
     // Edit user details
-    public function edit($id) {
+    public function edit($id)
+    {
         if ($this->input->post()) {
             // Get form data
             $data = array(
                 'name' => $this->input->post('name'),
                 'email' => $this->input->post('email'),
-                'phone_number' => $this->input->post('phone_number'),
+                'phone' => $this->input->post('phone'),
             );
             // Update user data
             $this->User_model->update_user($id, $data);
@@ -54,8 +59,22 @@ class Users extends CI_Controller {
     }
 
     // Delete a user
-    public function delete($id) {
+    public function delete($id)
+    {
         $this->User_model->delete_user($id);
         redirect('users');  // Redirect to the list of users
+    }
+
+    public function search_users()
+    {
+        $query = $this->input->get('term'); // Get the search query
+
+        if (strlen($query) < 2) {
+            echo json_encode([]);
+            return; // Exit the function to prevent further processing
+        }
+
+        $users = $this->User_model->search_users($query);
+        echo json_encode($users);  // Return the search results as JSON
     }
 }
