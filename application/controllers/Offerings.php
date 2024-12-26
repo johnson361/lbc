@@ -10,6 +10,7 @@ class Offerings extends CI_Controller
         $this->load->model('Offering_model');
         $this->load->model('Service_model');
         $this->load->model('User_model');
+        $this->load->helper('common');
     }
 
     public function index()
@@ -21,6 +22,31 @@ class Offerings extends CI_Controller
         $this->load->view('layouts/navbar', $data);
         $this->load->view('layouts/main', $data);
     }
+    
+    public function summary($service_date = null)
+    {
+        $service_date = $service_date ?: date('Y-m-d');
+
+        $headers = $this->Offering_model->get_headers_by_date($service_date);
+
+        $summary_data = [];
+        foreach ($headers as $header) {
+            $details = $this->Offering_model->get_details_by_service($header['service_id'], $service_date);
+            $summary_data[] = [
+                'header' => $header,
+                'details' => $details
+            ];
+        }
+
+        $data['summary_data'] = $summary_data;
+        $data['service_date'] = $service_date; // Pass the date for display if needed
+        $data['page_content'] = 'offerings/summary';
+
+        // Load the main layout and content
+        $this->load->view('layouts/navbar', $data);
+        $this->load->view('layouts/main', $data);
+    }
+
 
     public function add()
     {
@@ -37,9 +63,19 @@ class Offerings extends CI_Controller
             return;
         }
 
+        if (empty($data['service_date'])) {
+            echo json_encode(['success' => false, 'message' => 'Invalid service_date data.']);
+            return;
+        }
+
         $data['user_id'] = $this->getUserIdFromMember($data['autocomplete_member']);
         if (!$data['user_id']) {
-            echo json_encode(['success' => false, 'message' => 'Failed to process user data.']);
+            echo json_encode(['success' => false, 'message' => 'User id processing failed.']);
+            return;
+        }
+
+        if (!$this->isValidDenomination($data)) { //if not isValidDenomination
+            echo json_encode(['success' => false, 'message' => 'Please enter atlease one Denomination.']);
             return;
         }
 
@@ -48,6 +84,7 @@ class Offerings extends CI_Controller
             echo json_encode(['success' => true, 'message' => 'Offering added successfully.']);
         } else {
             echo json_encode(['success' => false, 'message' => 'Failed to add offering.']);
+            return;
         }
     }
 
@@ -68,7 +105,48 @@ class Offerings extends CI_Controller
         return false;
     }
 
+    function isValidDenomination($data)
+    {
+        foreach ($data as $key => $value) {
+            if (strpos($key, 'denomination') !== false && !empty($value)) {
+                return true; // Return true if a non-empty denomination is found
+            }
+        }
+        return false; // Return false if no non-empty denomination is found
+    }
 
+    public function fetchExistingData()
+    {
+
+
+        // Get POST data
+        $serviceId = $this->input->post('service_id');
+        $serviceDate = $this->input->post('service_date');
+
+        // Validate inputs
+        if (empty($serviceId) || empty($serviceDate)) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Both Service ID and Date are required.'
+            ]);
+            return;
+        }
+
+        $data = $this->Offering_model->getExistingData($serviceId, $serviceDate);
+
+        // Check if data is available
+        if (!empty($data)) {
+            echo json_encode([
+                'success' => true,
+                'data' => $data
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'No data found for the selected service and date.'
+            ]);
+        }
+    }
 
     // public function save() {
     //     if ($this->input->post()) {

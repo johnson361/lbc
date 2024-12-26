@@ -25,9 +25,9 @@ class Users extends CI_Controller
         if ($this->input->post()) {
             // Get form data
             $data = array(
-                'name' => $this->input->post('name'),
-                'email' => $this->input->post('email'),
-                'phone' => $this->input->post('phone'),
+                'name'  => $this->input->post('name') ?? NULL,
+                'email' => $this->input->post('email') ??  NULL,
+                'phone' => $this->input->post('phone') ?? NULL,
             );
             // Insert user into database
             $this->User_model->create_user($data);
@@ -44,10 +44,11 @@ class Users extends CI_Controller
         if ($this->input->post()) {
             // Get form data
             $data = array(
-                'name' => $this->input->post('name'),
-                'email' => $this->input->post('email'),
-                'phone' => $this->input->post('phone'),
+                'name'  => $this->input->post('name') ?? NULL,
+                'email' => $this->input->post('email') ??  NULL,
+                'phone' => $this->input->post('phone') ?? NULL,
             );
+
             // Update user data
             $this->User_model->update_user($id, $data);
             redirect('users');

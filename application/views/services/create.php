@@ -1,10 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Create Service</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
     <div class="container mt-5">
         <h2>Create Service</h2>
         <form method="POST">
@@ -36,5 +29,3 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
-</body>
-</html>

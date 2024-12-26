@@ -44,7 +44,9 @@ class Services extends CI_Controller {
             }
         }
 
-        $this->load->view('services/create', $data);
+        $data['page_content'] = 'services/create';
+        $this->load->view('layouts/navbar', $data);
+        $this->load->view('layouts/main', $data);
     }
 
     public function edit($id) {
@@ -69,7 +71,10 @@ class Services extends CI_Controller {
             }
         }
 
-        $this->load->view('services/edit', $data);
+        // $this->load->view('services/edit', $data);
+        $data['page_content'] = 'services/edit';
+        $this->load->view('layouts/navbar', $data);
+        $this->load->view('layouts/main', $data);
     }
 
     public function delete($id) {
