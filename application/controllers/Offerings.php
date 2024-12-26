@@ -13,16 +13,17 @@ class Offerings extends CI_Controller
         $this->load->helper('common');
     }
 
-    public function index()
+    public function index($serviceId = 0, $serviceDate = '')
     {
         $data['services'] = $this->Service_model->get_all_services();
         $data['users'] = $this->User_model->get_all_users();
-
+        if (!empty($serviceId) && !empty($serviceDate))
+            $data['existing_data'] = $this->Offering_model->get_details_by_service($serviceId, $serviceDate);
         $data['page_content'] = 'offerings/index';  // Path to the offerings view
         $this->load->view('layouts/navbar', $data);
         $this->load->view('layouts/main', $data);
     }
-    
+
     public function summary($service_date = null)
     {
         $service_date = $service_date ?: date('Y-m-d');
@@ -117,8 +118,6 @@ class Offerings extends CI_Controller
 
     public function fetchExistingData()
     {
-
-
         // Get POST data
         $serviceId = $this->input->post('service_id');
         $serviceDate = $this->input->post('service_date');
@@ -132,7 +131,8 @@ class Offerings extends CI_Controller
             return;
         }
 
-        $data = $this->Offering_model->getExistingData($serviceId, $serviceDate);
+        $serviceDate = convertToMySQLDate($serviceDate);
+        $data = $this->Offering_model->get_details_by_service($serviceId, $serviceDate);
 
         // Check if data is available
         if (!empty($data)) {

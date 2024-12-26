@@ -1,3 +1,11 @@
+<?php
+$service_id = $this->uri->segment(3);
+$service_date = $this->uri->segment(4);
+
+$tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
+
+
+?>
 <div class="container-fluid">
     <!-- <h2>Offerings</h2> -->
     <form method="POST" action="<?= site_url('offerings/save'); ?>">
@@ -5,12 +13,14 @@
         <div class="mt-2 mb-2 d-flex justify-content-end align-items-center">
             <!-- <label for="service_id" class="form-label mr-2">Select Service</label> -->
 
-            <label class="me-4">
-                <input type="checkbox" id="short_coins_toggle"> Show Short Coins
-            </label>
-            <label class="me-5">
-                <input type="checkbox" id="short_notes_toggle"> Show Short Notes
-            </label>
+            <span class="<?= $tableClass ?>">
+                <label class="me-4">
+                    <input type="checkbox" id="short_coins_toggle"> Show Short Coins
+                </label>
+                <label class="me-5">
+                    <input type="checkbox" id="short_notes_toggle"> Show Short Notes
+                </label>
+            </span>
 
             <label class="me-5">
                 <!-- <label for="date">Service Date</label> -->
@@ -20,13 +30,14 @@
             <select name="service_id" id="service_id" class="form-select" style=" width: 400; ">
                 <option value="">--Please Select Service-- </option>
                 <?php foreach ($services as $service): ?>
-                    <option value="<?= $service['id'] ?>"><?= $service['language_name'] ?> - <?= $service['offering_name'] ?> - <?= $service['service_slot'] ?></option>
+                    <option value="<?= $service['id'] ?>" <?= $service_id == $service['id'] ? 'selected' : '' ?>>
+                        <?= $service['language_name'] ?> - <?= $service['offering_name'] ?> - <?= $service['service_slot'] ?>
+                    </option>
                 <?php endforeach; ?>
             </select>
         </div>
 
-
-        <table class="table table-bordered offerings_table">
+        <table class="table table-bordered offerings_table <?= $tableClass ?>">
             <thead>
                 <tr>
                     <th>SNO</th>
@@ -51,37 +62,79 @@
                 </tr>
             </thead>
             <tbody id="offerings-container">
-                <tr class="original_tr">
-                    <td class="row-number">1</td>
-                    <td>
-                        <input type="hidden" name="offerings[0][serial_no]" class="serial_no" value="1" />
-                        <div class="autocomplete-container">
-                            <input type="text" class="form-select autocomplete_member" name="offerings[0][autocomplete_member]" placeholder="Start typing...">
+                <?php
+                $serialNo = 1; // Default serial number starts at 1
+                if (!empty($existing_data)):
+                    foreach ($existing_data as $index => $data):
+                        $serialNo = $index + 1; // Increment serial number for each entry
+                ?>
+                        <tr>
+                            <td class="row-number"><?= $serialNo ?></td>
+                            <td>
+                                <input type="hidden" name="offerings[<?= $serialNo ?>][serial_no]" class="serial_no" value="<?= $serialNo ?>" />
+                                <div class="autocomplete-container">
+                                    <input type="text" disabled class="form-select autocomplete_member" name="offerings[<?= $serialNo ?>][autocomplete_member]" value="<?= htmlspecialchars($data['full_name'] ?? '') ?>" placeholder="Start typing...">
+                                    <ul class="suggestions"></ul>
+                                </div>
+                            </td>
+                            <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_2000]" class="form-control denomination" value="<?= $data['denomination_2000'] ?? 0 ?>" required></td>
+                            <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_500]" class="form-control denomination" value="<?= $data['denomination_500'] ?? 0 ?>" required></td>
+                            <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_200]" class="form-control denomination" value="<?= $data['denomination_200'] ?? 0 ?>" required></td>
+                            <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_100]" class="form-control denomination" value="<?= $data['denomination_100'] ?? 0 ?>" required></td>
+                            <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_50]" class="form-control denomination" value="<?= $data['denomination_50'] ?? 0 ?>" required></td>
+                            <td class="short_notes"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_20_notes]" class="form-control denomination" value="<?= $data['denomination_20_notes'] ?? 0 ?>" required></td>
+                            <td class="short_coins"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_20_coins]" class="form-control denomination" value="<?= $data['denomination_20_coins'] ?? 0 ?>" required></td>
+                            <td class="short_notes"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_10_notes]" class="form-control denomination" value="<?= $data['denomination_10_notes'] ?? 0 ?>" required></td>
+                            <td class="short_coins"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_10_coins]" class="form-control denomination" value="<?= $data['denomination_10_coins'] ?? 0 ?>" required></td>
+                            <td class="short_notes"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_5_notes]" class="form-control denomination" value="<?= $data['denomination_5_notes'] ?? 0 ?>" required></td>
+                            <td class="short_coins"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_5_coins]" class="form-control denomination" value="<?= $data['denomination_5_coins'] ?? 0 ?>" required></td>
+                            <td class="short_notes"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_2_notes]" class="form-control denomination" value="<?= $data['denomination_2_notes'] ?? 0 ?>" required></td>
+                            <td class="short_coins"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_2_coins]" class="form-control denomination" value="<?= $data['denomination_2_coins'] ?? 0 ?>" required></td>
+                            <td class="short_notes"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_1_notes]" class="form-control denomination" value="<?= $data['denomination_1_notes'] ?? 0 ?>" required></td>
+                            <td class="short_coins"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_1_coins]" class="form-control denomination" value="<?= $data['denomination_1_coins'] ?? 0 ?>" required></td>
+                            <td><span class="total-amount"><?= $data['total_amount'] ?? 0 ?></span></td>
+                            <td>
+                                <button type="button" disabled class="btn btn-success add-offering">Add</button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php $serialNo = $serialNo + 1; ?>
+                <?php else: ?>
+                    <?php $serialNo = 1; ?>
+                <?php endif; ?>
 
+                <tr>
+                    <td class="row-number"><?= $serialNo ?></td>
+                    <td>
+                        <input type="hidden" name="offerings[<?= $serialNo ?>][serial_no]" class="serial_no" value="<?= $serialNo ?>" />
+                        <div class="autocomplete-container">
+                            <input type="text" class="form-select autocomplete_member" name="offerings[<?= $serialNo ?>][autocomplete_member]" placeholder="Start typing...">
                             <ul class="suggestions"></ul>
                         </div>
                     </td>
-                    <td><input type="number" name="offerings[0][denomination_2000]" class="form-control denomination" value="0" required></td>
-                    <td><input type="number" name="offerings[0][denomination_500]" class="form-control denomination" value="0" required></td>
-                    <td><input type="number" name="offerings[0][denomination_200]" class="form-control denomination" value="0" required></td>
-                    <td><input type="number" name="offerings[0][denomination_100]" class="form-control denomination" value="0" required></td>
-                    <td><input type="number" name="offerings[0][denomination_50]" class="form-control denomination" value="0" required></td>
-                    <td class="short_notes"><input type="number" name="offerings[0][denomination_20_notes]" class="form-control denomination" value="0" required></td>
-                    <td class="short_coins"><input type="number" name="offerings[0][denomination_20_coins]" class="form-control denomination" value="0" required></td>
-                    <td class="short_notes"><input type="number" name="offerings[0][denomination_10_notes]" class="form-control denomination" value="0" required></td>
-                    <td class="short_coins"><input type="number" name="offerings[0][denomination_10_coins]" class="form-control denomination" value="0" required></td>
-                    <td class="short_notes"><input type="number" name="offerings[0][denomination_5_notes]" class="form-control denomination" value="0" required></td>
-                    <td class="short_coins"><input type="number" name="offerings[0][denomination_5_coins]" class="form-control denomination" value="0" required></td>
-                    <td class="short_notes"><input type="number" name="offerings[0][denomination_2_notes]" class="form-control denomination" value="0" required></td>
-                    <td class="short_coins"><input type="number" name="offerings[0][denomination_2_coins]" class="form-control denomination" value="0" required></td>
-                    <td class="short_notes"><input type="number" name="offerings[0][denomination_1_notes]" class="form-control denomination" value="0" required></td>
-                    <td class="short_coins"><input type="number" name="offerings[0][denomination_1_coins]" class="form-control denomination" value="0" required></td>
+                    <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_2000]" class="form-control denomination" value="0" required></td>
+                    <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_500]" class="form-control denomination" value="0" required></td>
+                    <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_200]" class="form-control denomination" value="0" required></td>
+                    <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_100]" class="form-control denomination" value="0" required></td>
+                    <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_50]" class="form-control denomination" value="0" required></td>
+                    <td class="short_notes"><input type="number" name="offerings[<?= $serialNo ?>][denomination_20_notes]" class="form-control denomination" value="0" required></td>
+                    <td class="short_coins"><input type="number" name="offerings[<?= $serialNo ?>][denomination_20_coins]" class="form-control denomination" value="0" required></td>
+                    <td class="short_notes"><input type="number" name="offerings[<?= $serialNo ?>][denomination_10_notes]" class="form-control denomination" value="0" required></td>
+                    <td class="short_coins"><input type="number" name="offerings[<?= $serialNo ?>][denomination_10_coins]" class="form-control denomination" value="0" required></td>
+                    <td class="short_notes"><input type="number" name="offerings[<?= $serialNo ?>][denomination_5_notes]" class="form-control denomination" value="0" required></td>
+                    <td class="short_coins"><input type="number" name="offerings[<?= $serialNo ?>][denomination_5_coins]" class="form-control denomination" value="0" required></td>
+                    <td class="short_notes"><input type="number" name="offerings[<?= $serialNo ?>][denomination_2_notes]" class="form-control denomination" value="0" required></td>
+                    <td class="short_coins"><input type="number" name="offerings[<?= $serialNo ?>][denomination_2_coins]" class="form-control denomination" value="0" required></td>
+                    <td class="short_notes"><input type="number" name="offerings[<?= $serialNo ?>][denomination_1_notes]" class="form-control denomination" value="0" required></td>
+                    <td class="short_coins"><input type="number" name="offerings[<?= $serialNo ?>][denomination_1_coins]" class="form-control denomination" value="0" required></td>
                     <td><span class="total-amount">0</span></td>
                     <td>
                         <button type="button" class="btn btn-success add-offering">Add</button>
                     </td>
                 </tr>
             </tbody>
+
+
             <tfoot>
                 <tr id="totals-row">
                     <th id="count-rows"></th>
@@ -116,11 +169,15 @@
         <!-- <button type="submit" class="btn btn-primary mt-3">Submit Offerings</button> -->
     </form>
 </div>
+
+<?php
+$default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', strtotime($service_date));
+?>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         flatpickr("#service_date", {
             dateFormat: "d/m/Y", // Custom format dd/mm/yyyy
-            defaultDate: new Date(), // Set the default date to the current date
+            defaultDate: "<?php echo $default_service_date; ?>",
         });
     });
 
@@ -146,6 +203,15 @@
 
 
     $(document).ready(function() {
+        <?php if (empty($tableClass)) { ?>
+            $('#service_date').prop('disabled', true);
+            $('#service_id').css({
+                'pointer-events': 'none', // Disable interaction (simulates read-only)
+                'background-color': '#f0f0f0', // Optional: Change background color to simulate read-only state
+                'color': '#666' // Optional: Change the text color to simulate read-only state
+            });
+        <?php } ?>
+
         let baseUrl = '<?= base_url(); ?>';
         let debounceTimeout;
 
@@ -172,7 +238,7 @@
                                 response.forEach(function(item) {
                                     suggestionsList.append('<li data-id="' + item.id + '">' + item.name + '</li>');
                                 });
-                            } 
+                            }
                             // else {
                             //     // suggestionsList.append('<li>No results found</li>');
                             //     PNotify.error({
@@ -231,8 +297,10 @@
             userInput.val(selectedName); // Set the input field value
             $(this).closest('.suggestions').empty(); // Clear the suggestions list
         });
-
-        let rowCount = 1;
+        <?php
+        $sno = !empty($existing_data) ? count($existing_data) + 1 : 1;
+        ?>
+        let rowCount = <?= $sno + 1 ?>;
 
         const denominations = [{
                 name: 'denomination_2000',
@@ -337,9 +405,16 @@
             $('#grand-total').text(grandTotal); // Update the grand total in the footer
         }
 
+        function convertToMySQLDate(dateString) {
+            const [day, month, year] = dateString.split('/');
+            return `${year}-${month}-${day}`;
+        }
+
         function updateCurrencyTable() {
-            let tableHtml = '<table class="table table-bordered mt-3" style="width:400px">';
+            let tableHtml = '<table class="table table-bordered mt-3 text-end" style="width:400px">';
             tableHtml += '<thead><tr><th>Denomination</th><th>Count of Notes/Coins</th><th>Amount</th></tr></thead><tbody>';
+
+            let grandTotal = 0; // Initialize a variable to store the total amount
 
             denominations.forEach(function(denom) {
                 // console.log('denom', denom);
@@ -359,9 +434,13 @@
 
                 // Only show rows with non-zero amounts
                 if (totalAmount > 0) {
-                    tableHtml += `<tr><td>${denom.value} ${typeSymbol}</td><td>${totalCount}</td><td>${totalAmount}</td></tr>`;
+                    tableHtml += `<tr><td>₹${denom.value} ${typeSymbol}</td><td>${totalCount}</td><td>₹${totalAmount}</td></tr>`;
+                    grandTotal += totalAmount; // Add to the grand total
                 }
             });
+
+            // Add the total amount row at the end
+            tableHtml += `<tr><td colspan="2"><strong>Total Amount</strong></td><td><strong>₹${grandTotal}</strong></td></tr>`;
 
             tableHtml += '</tbody></table>';
             $('#currency-total-table').html(tableHtml); // Assuming there's a container with ID 'currency-total-table' to append the table
@@ -383,16 +462,28 @@
         });
 
         $('#service_id').on('change', function() {
-            // Simulate read-only behavior by preventing any further interaction
-            $('#service_date').prop('disabled', true);
+            const serviceId = $('#service_id').val();
+            const serviceDate = $('#service_date').val();
+            const mysqlDate = convertToMySQLDate(serviceDate);
 
-            $(this).css({
-                'pointer-events': 'none', // Disable interaction (simulates read-only)
-                'background-color': '#f0f0f0', // Optional: Change background color to simulate read-only state
-                'color': '#666' // Optional: Change the text color to simulate read-only state
-            });
-            // fetchExistingData();
+            if (serviceId && serviceDate) {
+                const baseUrl = "<?php echo base_url(); ?>"; // Get the base URL from CodeIgniter
+                window.location.href = baseUrl + 'offerings/index/' + serviceId + '/' + mysqlDate;
+            }
         });
+
+
+        // $('#service_id').on('change', function() {
+        //     // Simulate read-only behavior by preventing any further interaction
+        //     $('#service_date').prop('disabled', true);
+
+        //     $(this).css({
+        //         'pointer-events': 'none', // Disable interaction (simulates read-only)
+        //         'background-color': '#f0f0f0', // Optional: Change background color to simulate read-only state
+        //         'color': '#666' // Optional: Change the text color to simulate read-only state
+        //     });
+        //     // fetchExistingData();
+        // });
 
         // function fetchExistingData() {
         //     // Get selected service_id and service_date values
@@ -455,9 +546,10 @@
         //                     // Append the populated row to the table body
         //                     $('#offerings-container').append(newRow);
         //                 });
-        //             } else {
-        //                 alert(data.message || 'No data found.');
-        //             }
+        //             } 
+        //             // else {
+        //             //     alert(data.message || 'No data found.');
+        //             // }
         //         },
         //         error: function(xhr, status, error) {
         //             console.error('AJAX Error:', error);
@@ -467,11 +559,8 @@
         // }
 
         function addNewRow() {
-            // Clone the first row
             const newRow = $('tbody tr:first').clone();
 
-            // Reset input values for the new row
-            // newRow.find('input').val(0);
             newRow.find('input').not('.autocomplete_member').val(0); //excepet firt column
             newRow.find('.autocomplete_member').val(''); //set it to empty 
 
@@ -480,25 +569,35 @@
 
             newRow.find('.total-amount').text('0'); // Set total to 0 for the new row
 
-            // Modify the name attributes to ensure they are unique for each row
-            //newRow.find('input[name*="offerings[0][autocomplete_member]"]').attr('name', `offerings[${rowCount}][autocomplete_member]`).val('');
             newRow.find('input').each(function() {
-                const name = $(this).attr('name').replace('[0]', `[${rowCount}]`);
+                console.log('dddddddfxxx', $(this).attr('name'));
+                const name = $(this).attr('name').replace('[1]', `[${rowCount}]`);
                 $(this).attr('name', name);
             });
 
-            // Update row number
-            newRow.find('.row-number').text(rowCount + 1); // Set the row number based on rowCount
-            newRow.find('.serial_no').val(rowCount + 1);
+            newRow.find('.row-number').text(rowCount); // Set the row number based on rowCount
+            newRow.find('.serial_no').val(rowCount);
 
-            // Append the new row to the table
             $('#offerings-container').append(newRow);
             rowCount++; // Increment the rowCount
 
-            // Scroll to the bottom of the table body
             $('html, body').animate({
                 scrollTop: $('#offerings-container').offset().top + $('#offerings-container').height()
             }, 500); // Smooth scroll to the bottom in 500ms
+
+            $(window).on('wheel', {
+                passive: true
+            }, function(e) {
+                var delta = e.originalEvent.deltaY; // Get the scroll amount in Y direction
+                if (delta > 0) {
+                    // console.log("Scrolling down");
+                    // Add logic for scrolling down
+                } else {
+                    // console.log("Scrolling up");
+                    // Add logic for scrolling up
+                }
+            });
+
         } //add row
 
         $(document).on('click', '.add-offering', function() {
@@ -512,8 +611,8 @@
                 data[name] = value; // Add to the data object
             });
 
-            const rowIndex = row.find('.row-number').text() - 1; // Get row number and adjust to zero-based index
-            console.log('rowIndex', rowIndex);
+            const rowIndex = row.find('.row-number').text();
+            console.log('current_rowIndex', rowIndex);
             data[`offerings[${rowIndex}][service_id]`] = $('#service_id').val();
             data[`offerings[${rowIndex}][service_date]`] = $('#service_date').val();
 

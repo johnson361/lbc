@@ -49,7 +49,7 @@
     width: 300px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    margin: 10px 0;
+    /* margin: 10px 0; */
     box-sizing: border-box;
     transition: border-color 0.3s ease-in-out;
 }
@@ -98,19 +98,27 @@
     padding: 10px;
 }
 
-.offerings_table thead th.short_coins, 
+.offerings_table thead th.short_coins,
 .offerings_table tbody td.short_coins {
-    background-color: #f0f0f0; 
+    background-color: #f0f0f0;
 }
 
-.offerings_table thead th.short_notes, 
+.offerings_table thead th.short_notes,
 .offerings_table tbody td.short_notes {
-    background-color: #ffc1c1; 
+    background-color: #ffc1c1;
 }
 
 
-.short_coins, .short_notes {
+.short_coins,
+.short_notes {
     display: none;
+}
+
+
+@media print {
+    .navbar {
+        display: none;
+    }
 }
 
 /* Responsive design */
