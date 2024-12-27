@@ -203,6 +203,8 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
 
 
     $(document).ready(function() {
+        smoothScrollAndHandleScroll('#offerings-container', 500);
+
         <?php if (empty($tableClass)) { ?>
             $('#service_date').prop('disabled', true);
             $('#service_id').css({
@@ -558,6 +560,26 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
         //     });
         // }
 
+        function smoothScrollAndHandleScroll(containerSelector, duration) {
+            $('html, body').animate({
+                scrollTop: $(containerSelector).offset().top + $(containerSelector).height()
+            }, duration);
+
+            // Add scroll event listener
+            $(window).on('wheel', {
+                passive: true
+            }, function(e) {
+                var delta = e.originalEvent.deltaY; // Get the scroll amount in the Y direction
+                if (delta > 0) {
+                    console.log("Scrolling down");
+                    // Add custom logic for scrolling down
+                } else {
+                    console.log("Scrolling up");
+                    // Add custom logic for scrolling up
+                }
+            });
+        }
+
         function addNewRow() {
             const newRow = $('tbody tr:first').clone();
 
@@ -581,23 +603,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             $('#offerings-container').append(newRow);
             rowCount++; // Increment the rowCount
 
-            $('html, body').animate({
-                scrollTop: $('#offerings-container').offset().top + $('#offerings-container').height()
-            }, 500); // Smooth scroll to the bottom in 500ms
-
-            $(window).on('wheel', {
-                passive: true
-            }, function(e) {
-                var delta = e.originalEvent.deltaY; // Get the scroll amount in Y direction
-                if (delta > 0) {
-                    // console.log("Scrolling down");
-                    // Add logic for scrolling down
-                } else {
-                    // console.log("Scrolling up");
-                    // Add logic for scrolling up
-                }
-            });
-
+            smoothScrollAndHandleScroll('#offerings-container', 500);
         } //add row
 
         $(document).on('click', '.add-offering', function() {
@@ -634,6 +640,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                             delay: 2000
                         });
                         addNewRow();
+                        row.find('ul.suggestions').remove(); //remove suggession if there are any
                         row.find('input, select').attr('readonly', true).prop('disabled', true);
                         row.find('.add-offering').prop('disabled', true).addClass('disabled');
                     } else {
