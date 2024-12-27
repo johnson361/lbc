@@ -119,6 +119,10 @@
     .navbar {
         display: none;
     }
+
+    .page-break {
+        page-break-before: always;
+    }
 }
 
 /* Responsive design */

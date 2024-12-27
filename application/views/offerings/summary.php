@@ -1,5 +1,5 @@
 <div class="container-fluid">
-    <h3 style="text-align:center">Offerings Summary for <?= (new DateTime($service_date))->format('d-m-Y') ?></h3>
+    <h3 style="text-align:center">Offerings Summary for <?php echo $service_date = (new DateTime($service_date))->format('d-m-Y') ?></h3>
 
     <?php if (!empty($summary_data)): ?>
         <?php
@@ -71,7 +71,7 @@
                     </thead>
                     <tbody>
                         <?php foreach ($item['details'] as $detail): ?>
-                            <tr >
+                            <tr>
                                 <td class="text-end"><span><?= htmlspecialchars($detail['serial_no']) ?></span></td>
                                 <td><span><?= htmlspecialchars($detail['full_name']) ?></span></td>
                                 <td class="text-end"><span class="<?= $detail['denomination_2000'] == 0 ? 'd-none' : '' ?>">
@@ -186,155 +186,212 @@
                         </tr>
                     </tfoot>
                 </table>
+
+                <table class="table table-bordered table-striped table-hover text-end" style="width: 500px;">
+                    <thead>
+                        <tr>
+                            <th>Denomination</th>
+                            <th>Count of Notes/Coins</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        // Array of denominations and their corresponding values
+                        $denominations = [
+                            '₹2000' => ['total' => $total_2000 ?? 0],
+                            '₹500' => ['total' => $total_500 ?? 0],
+                            '₹200' => ['total' => $total_200 ?? 0],
+                            '₹100' => ['total' => $total_100 ?? 0],
+                            '₹50' => ['total' => $total_50 ?? 0],
+                            '₹20 Notes' => ['total' => $total_20_notes ?? 0],
+                            '₹20 Coins' => ['total' => $total_20_coins ?? 0],
+                            '₹10 Notes' => ['total' => $total_10_notes ?? 0],
+                            '₹10 Coins' => ['total' => $total_10_coins ?? 0],
+                            '₹5 Notes' => ['total' => $total_5_notes ?? 0],
+                            '₹5 Coins' => ['total' => $total_5_coins ?? 0],
+                            '₹2 Notes' => ['total' => $total_2_notes ?? 0],
+                            '₹2 Coins' => ['total' => $total_2_coins ?? 0],
+                            '₹1 Notes' => ['total' => $total_1_notes ?? 0],
+                            '₹1 Coins' => ['total' => $total_1_coins ?? 0],
+                        ];
+
+                        $grandTotal = 0;
+                        foreach ($denominations as $denomination => $data) {
+                            if ($data['total'] == 0) {
+                                continue;  // Skip the current iteration and move to the next
+                            }
+                            $denom_value = (int) preg_replace('/\D/', '', $denomination);
+                            $amount = (int) $denom_value *  (int) $data['total'];
+                            echo "<tr>
+                            <td>{$denomination}</td>
+                            <td><strong>" . $data['total'] . "</strong></td>
+                            <td><strong>" . htmlspecialchars($amount) . "</strong></td>
+                          </tr>";
+                            $grandTotal += $amount;
+                        }
+                        ?>
+                        <tr>
+                            <td><strong>Total</strong></td>
+                            <td></td>
+                            <td><strong><?= htmlspecialchars($grandTotal) ?></strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
             <?php else: ?>
                 <p>No details found for this service.</p>
             <?php endif; ?>
+            <div class="page-break"></div>
         <?php endforeach; ?>
     <?php else: ?>
         <p>No offerings found for the selected date.</p>
     <?php endif; ?>
 
 
-    <div class="mt-5 service-header">Final Denomination Summary</Summary>
+    <div class="mt-5 service-header" style="font-size: 25px;">Final Denomination Summary for <?php echo $service_date; ?></Summary>
     </div>
-    <table class="table table-bordered table-striped table-hover text-end" style=" width: 500;">
-        <thead>
-            <tr>
-                <th>Denomination</th>
-                <th>Count of Notes/Coins</th>
-                <th>Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($grand_total_2000)): ?>
+    <div class="d-flex justify-content-center">
+        <table class="table table-bordered table-striped table-hover text-end" style=" width: 500;">
+            <thead>
                 <tr>
-                    <td>₹2000</td>
-                    <td><strong><?= $grand_total_2000 ?></strong></td>
-                    <td><strong><?= $grand_total_2000 * 2000 ?></strong></td>
+                    <th>Denomination</th>
+                    <th>Count of Notes/Coins</th>
+                    <th>Amount</th>
                 </tr>
-            <?php endif; ?>
+            </thead>
+            <tbody>
+                <?php if (!empty($grand_total_2000)): ?>
+                    <tr>
+                        <td>₹2000</td>
+                        <td><strong><?= $grand_total_2000 ?></strong></td>
+                        <td><strong><?= $grand_total_2000 * 2000 ?></strong></td>
+                    </tr>
+                <?php endif; ?>
 
-            <?php if (!empty($grand_total_500)): ?>
-                <tr>
-                    <td>₹500</td>
-                    <td><strong><?= $grand_total_500 ?></strong></td>
-                    <td><strong><?= $grand_total_500 * 500 ?></strong></td>
-                </tr>
-            <?php endif; ?>
+                <?php if (!empty($grand_total_500)): ?>
+                    <tr>
+                        <td>₹500</td>
+                        <td><strong><?= $grand_total_500 ?></strong></td>
+                        <td><strong><?= $grand_total_500 * 500 ?></strong></td>
+                    </tr>
+                <?php endif; ?>
 
-            <?php if (!empty($grand_total_200)): ?>
-                <tr>
-                    <td>₹200</td>
-                    <td><strong><?= $grand_total_200 ?></strong></td>
-                    <td><strong><?= $grand_total_200 * 200 ?></strong></td>
-                </tr>
-            <?php endif; ?>
+                <?php if (!empty($grand_total_200)): ?>
+                    <tr>
+                        <td>₹200</td>
+                        <td><strong><?= $grand_total_200 ?></strong></td>
+                        <td><strong><?= $grand_total_200 * 200 ?></strong></td>
+                    </tr>
+                <?php endif; ?>
 
-            <?php if (!empty($grand_total_100)): ?>
-                <tr>
-                    <td>₹100</td>
-                    <td><strong><?= $grand_total_100 ?></strong></td>
-                    <td><strong><?= $grand_total_100 * 100 ?></strong></td>
-                </tr>
-            <?php endif; ?>
+                <?php if (!empty($grand_total_100)): ?>
+                    <tr>
+                        <td>₹100</td>
+                        <td><strong><?= $grand_total_100 ?></strong></td>
+                        <td><strong><?= $grand_total_100 * 100 ?></strong></td>
+                    </tr>
+                <?php endif; ?>
 
-            <?php if (!empty($grand_total_50)): ?>
-                <tr>
-                    <td>₹50</td>
-                    <td><strong><?= $grand_total_50 ?></strong></td>
-                    <td><strong><?= $grand_total_50 * 50 ?></strong></td>
-                </tr>
-            <?php endif; ?>
+                <?php if (!empty($grand_total_50)): ?>
+                    <tr>
+                        <td>₹50</td>
+                        <td><strong><?= $grand_total_50 ?></strong></td>
+                        <td><strong><?= $grand_total_50 * 50 ?></strong></td>
+                    </tr>
+                <?php endif; ?>
 
-            <?php if (!empty($grand_total_20_notes)): ?>
-                <tr>
-                    <td>₹20 Notes</td>
-                    <td><strong><?= $grand_total_20_notes ?></strong></td>
-                    <td><strong><?= $grand_total_20_notes * 20 ?></strong></td>
-                </tr>
-            <?php endif; ?>
+                <?php if (!empty($grand_total_20_notes)): ?>
+                    <tr>
+                        <td>₹20 Notes</td>
+                        <td><strong><?= $grand_total_20_notes ?></strong></td>
+                        <td><strong><?= $grand_total_20_notes * 20 ?></strong></td>
+                    </tr>
+                <?php endif; ?>
 
-            <?php if (!empty($grand_total_20_coins)): ?>
-                <tr>
-                    <td>₹20 Coins</td>
-                    <td><strong><?= $grand_total_20_coins ?></strong></td>
-                    <td><strong><?= $grand_total_20_coins * 20 ?></strong></td>
-                </tr>
-            <?php endif; ?>
+                <?php if (!empty($grand_total_20_coins)): ?>
+                    <tr>
+                        <td>₹20 Coins</td>
+                        <td><strong><?= $grand_total_20_coins ?></strong></td>
+                        <td><strong><?= $grand_total_20_coins * 20 ?></strong></td>
+                    </tr>
+                <?php endif; ?>
 
-            <?php if (!empty($grand_total_10_notes)): ?>
-                <tr>
-                    <td>₹10 Notes</td>
-                    <td><strong><?= $grand_total_10_notes ?></strong></td>
-                    <td><strong><?= $grand_total_10_notes * 10 ?></strong></td>
-                </tr>
-            <?php endif; ?>
+                <?php if (!empty($grand_total_10_notes)): ?>
+                    <tr>
+                        <td>₹10 Notes</td>
+                        <td><strong><?= $grand_total_10_notes ?></strong></td>
+                        <td><strong><?= $grand_total_10_notes * 10 ?></strong></td>
+                    </tr>
+                <?php endif; ?>
 
-            <?php if (!empty($grand_total_10_coins)): ?>
-                <tr>
-                    <td>₹10 Coins</td>
-                    <td><strong><?= $grand_total_10_coins ?></strong></td>
-                    <td><strong><?= $grand_total_10_coins * 10 ?></strong></td>
-                </tr>
-            <?php endif; ?>
+                <?php if (!empty($grand_total_10_coins)): ?>
+                    <tr>
+                        <td>₹10 Coins</td>
+                        <td><strong><?= $grand_total_10_coins ?></strong></td>
+                        <td><strong><?= $grand_total_10_coins * 10 ?></strong></td>
+                    </tr>
+                <?php endif; ?>
 
-            <?php if (!empty($grand_total_5_notes)): ?>
-                <tr>
-                    <td>₹5 Notes</td>
-                    <td><strong><?= $grand_total_5_notes ?></strong></td>
-                    <td><strong><?= $grand_total_5_notes * 5 ?></strong></td>
-                </tr>
-            <?php endif; ?>
+                <?php if (!empty($grand_total_5_notes)): ?>
+                    <tr>
+                        <td>₹5 Notes</td>
+                        <td><strong><?= $grand_total_5_notes ?></strong></td>
+                        <td><strong><?= $grand_total_5_notes * 5 ?></strong></td>
+                    </tr>
+                <?php endif; ?>
 
-            <?php if (!empty($grand_total_5_coins)): ?>
-                <tr>
-                    <td>₹5 Coins</td>
-                    <td><strong><?= $grand_total_5_coins ?></strong></td>
-                    <td><strong><?= $grand_total_5_coins * 5 ?></strong></td>
-                </tr>
-            <?php endif; ?>
+                <?php if (!empty($grand_total_5_coins)): ?>
+                    <tr>
+                        <td>₹5 Coins</td>
+                        <td><strong><?= $grand_total_5_coins ?></strong></td>
+                        <td><strong><?= $grand_total_5_coins * 5 ?></strong></td>
+                    </tr>
+                <?php endif; ?>
 
-            <?php if (!empty($grand_total_2_notes)): ?>
-                <tr>
-                    <td>₹2 Notes</td>
-                    <td><strong><?= $grand_total_2_notes ?></strong></td>
-                    <td><strong><?= $grand_total_2_notes * 2 ?></strong></td>
-                </tr>
-            <?php endif; ?>
+                <?php if (!empty($grand_total_2_notes)): ?>
+                    <tr>
+                        <td>₹2 Notes</td>
+                        <td><strong><?= $grand_total_2_notes ?></strong></td>
+                        <td><strong><?= $grand_total_2_notes * 2 ?></strong></td>
+                    </tr>
+                <?php endif; ?>
 
-            <?php if (!empty($grand_total_2_coins)): ?>
-                <tr>
-                    <td>₹2 Coins</td>
-                    <td><strong><?= $grand_total_2_coins ?></strong></td>
-                    <td><strong><?= $grand_total_2_coins * 2 ?></strong></td>
-                </tr>
-            <?php endif; ?>
+                <?php if (!empty($grand_total_2_coins)): ?>
+                    <tr>
+                        <td>₹2 Coins</td>
+                        <td><strong><?= $grand_total_2_coins ?></strong></td>
+                        <td><strong><?= $grand_total_2_coins * 2 ?></strong></td>
+                    </tr>
+                <?php endif; ?>
 
-            <?php if (!empty($grand_total_1_notes)): ?>
-                <tr>
-                    <td>₹1 Notes</td>
-                    <td><strong><?= $grand_total_1_notes ?></strong></td>
-                    <td><strong><?= $grand_total_1_notes * 1 ?></strong></td>
-                </tr>
-            <?php endif; ?>
+                <?php if (!empty($grand_total_1_notes)): ?>
+                    <tr>
+                        <td>₹1 Notes</td>
+                        <td><strong><?= $grand_total_1_notes ?></strong></td>
+                        <td><strong><?= $grand_total_1_notes * 1 ?></strong></td>
+                    </tr>
+                <?php endif; ?>
 
-            <?php if (!empty($grand_total_1_coins)): ?>
-                <tr>
-                    <td>₹1 Coins</td>
-                    <td><strong><?= $grand_total_1_coins ?></strong></td>
-                    <td><strong><?= $grand_total_1_coins * 1 ?></strong></td>
-                </tr>
-            <?php endif; ?>
+                <?php if (!empty($grand_total_1_coins)): ?>
+                    <tr>
+                        <td>₹1 Coins</td>
+                        <td><strong><?= $grand_total_1_coins ?></strong></td>
+                        <td><strong><?= $grand_total_1_coins * 1 ?></strong></td>
+                    </tr>
+                <?php endif; ?>
 
-            <?php if (!empty($grand_total_amount)): ?>
-                <tr>
-                    <td><strong>Grand Total</strong></td>
-                    <td></td>
-                    <td><strong><?= $grand_total_amount ?></strong></td>
-                </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+                <?php if (!empty($grand_total_amount)): ?>
+                    <tr>
+                        <td><strong>Grand Total</strong></td>
+                        <td></td>
+                        <td><strong><?= $grand_total_amount ?></strong></td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
 
 </div>
 <style>
