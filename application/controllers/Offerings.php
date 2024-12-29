@@ -89,6 +89,48 @@ class Offerings extends CI_Controller
         }
     }
 
+    public function update()
+    {
+        $post = $this->input->post();
+        $data = $post['data'][0];
+        // print_r($data);
+        if (empty($data)) {
+            echo json_encode(['success' => false, 'message' => 'No offerings data provided.']);
+            return;
+        }
+
+        if (empty($data['service_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Invalid service_id data.']);
+            return;
+        }
+
+        if (empty($data['service_date'])) {
+            echo json_encode(['success' => false, 'message' => 'Invalid service_date data.']);
+            return;
+        }
+
+        $data['user_id'] = $this->getUserIdFromMember($data['autocomplete_member']);
+        if (!$data['user_id']) {
+            echo json_encode(['success' => false, 'message' => 'User id processing failed.']);
+            return;
+        }
+
+        if (!$this->isValidDenomination($data)) { //if not isValidDenomination
+            echo json_encode(['success' => false, 'message' => 'Please enter atlease one Denomination.']);
+            return;
+        }
+        // echo "<pre>";
+        // print_r($data);
+        // exit;
+
+        $result = $this->Offering_model->update_offerings($data);
+        if ($result) {
+            echo json_encode(['success' => true, 'message' => 'Offering updated successfully.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to add offering.']);
+            return;
+        }
+    }
     public function getUserIdFromMember($autocomplete_member)
     {
         if (!empty($autocomplete_member)) {

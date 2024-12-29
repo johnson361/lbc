@@ -31,6 +31,25 @@ class Offering_model extends CI_Model
         return false; // Failure
     }
 
+    public function update_offerings($data)
+    {
+        unset($data['autocomplete_member']); //because i donto wnt to update this IN USERS TABLE
+        $data['service_date'] = convertToMySQLDate($data['service_date']);
+        // print_r($data);
+        // exit;
+        if (empty($data) || empty($data['id']) || !is_array($data)) {
+            return false; // Return false if no data or data is invalid
+        }
+        $this->db->where('id', $data['id']);
+        $this->db->update('offerings', $data);
+
+        if ($this->db->affected_rows() > 0) {
+            return true; // Success
+        }
+
+        return false; // Failure
+    }
+
     // public function getExistingData($service_id, $service_date)
     // {
     //     $service_date = convertToMySQLDate($service_date);

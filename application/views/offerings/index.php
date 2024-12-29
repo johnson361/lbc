@@ -71,6 +71,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                         <tr>
                             <td class="row-number"><?= $serialNo ?></td>
                             <td>
+                                <input type="hidden" name="offerings[<?= $serialNo ?>][id]" class="serial_no" value="<?= $data['id'] ?>" />
                                 <input type="hidden" name="offerings[<?= $serialNo ?>][serial_no]" class="serial_no" value="<?= $serialNo ?>" />
                                 <div class="autocomplete-container">
                                     <input type="text" disabled class="form-select autocomplete_member" name="offerings[<?= $serialNo ?>][autocomplete_member]" value="<?= htmlspecialchars($data['full_name'] ?? '') ?>" placeholder="Start typing...">
@@ -94,7 +95,8 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                             <td class="short_coins"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_1_coins]" class="form-control denomination" value="<?= $data['denomination_1_coins'] ?? 0 ?>" required></td>
                             <td><span class="total-amount"><?= $data['total_amount'] ?? 0 ?></span></td>
                             <td>
-                                <button type="button" disabled class="btn btn-success add-offering">Add</button>
+                                <button type="button" class="btn btn-success edit-offering">Edit</button>
+                                <button type="button" class="btn btn-success save-offering">Save</button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -606,6 +608,74 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             smoothScrollAndHandleScroll('#offerings-container', 500);
         } //add row
 
+        $(document).on('click', '.edit-offering', function() {
+            console.log('edit offering');
+            const row = $(this).closest('tr'); // Get the clicked row
+            row.find('input, select').attr('readonly', false).prop('disabled', false);
+            row.find('.edit-offering').hide(); // Hide the edit button
+            row.find('.save-offering').show();
+        });
+
+        $(document).on('click', '.save-offering', function() {
+            console.log('save offering');
+            const row = $(this).closest('tr'); // Get the clicked row
+            row.find('input, select').attr('readonly', true).prop('disabled', true);
+            row.find('.edit-offering').show(); // Hide the edit button
+            row.find('.save-offering').hide();
+
+            const data = {};
+
+            row.find('input').each(function() {
+                const name = $(this).attr('name'); // Get the input name
+                const value = $(this).val(); // Get the input value
+                data[name] = value; // Add to the data object
+            });
+
+            const rowIndex = row.find('.row-number').text();
+            console.log('current_rowIndex', rowIndex);
+            data[`offerings[${rowIndex}][service_id]`] = $('#service_id').val();
+            data[`offerings[${rowIndex}][service_date]`] = $('#service_date').val();
+            console.log('Updated data', data);
+
+            $.ajax({
+                url: '<?= site_url("offerings/update"); ?>', // Update to your AJAX handler
+                method: 'POST',
+                data: {
+                    data: data, // Send row data
+                },
+                dataType: 'json',
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        PNotify.success({
+                            title: 'Success!',
+                            text: 'Offering updated successfully.',
+                            delay: 2000
+                        });
+                        // addNewRow();
+                        row.find('ul.suggestions').remove(); //remove suggession if there are any
+                        row.find('input, select').attr('readonly', true).prop('disabled', true);
+                        // row.find('.add-offering').prop('disabled', true).addClass('disabled');
+                    } else {
+                        PNotify.error({
+                            title: 'Error!',
+                            text: response.message,
+                            delay: 2000
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', error);
+                    PNotify.error({
+                        title: 'Error!',
+                        text: error,
+                        delay: 2000
+                    });
+                },
+            });
+
+        });
+
         $(document).on('click', '.add-offering', function() {
             const row = $(this).closest('tr'); // Get the clicked row
             const data = {}; // Initialize data object to store values
@@ -666,5 +736,9 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
 <style>
     .suggestions li.active {
         background-color: #d3d3d3;
+    }
+
+    .save-offering {
+        display: none;
     }
 </style>
