@@ -42,7 +42,7 @@ class User_model extends CI_Model
         return $query->result_array();
     }
 
-    public function get_or_create_user($name)
+    public function get_or_create_user($name, $phone = null)
     {
         $this->db->where('name', $name);
         $query = $this->db->get('users');
@@ -51,7 +51,10 @@ class User_model extends CI_Model
             return $query->row()->id;
         }
 
-        $data = ['name' => $name];
+        $data = [
+            'name' => $name,
+            'phone' => !empty($phone) ? $phone : null,
+        ];
 
         if ($this->db->insert('users', $data)) {
             return $this->db->insert_id();

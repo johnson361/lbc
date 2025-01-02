@@ -1,3 +1,150 @@
+<?php
+function generateDenominationTable($total_2000 = 0, $total_500 = 0, $total_200 = 0, $total_100 = 0, $total_50 = 0, $total_20_notes = 0, $total_20_coins = 0, $total_10_notes = 0, $total_10_coins = 0, $total_5_notes = 0, $total_5_coins = 0, $total_2_notes = 0, $total_2_coins = 0, $total_1_notes = 0, $total_1_coins = 0, $filter = null)
+{
+    // Array of denominations and their corresponding values
+    $denominations = [
+        '₹2000' => ['total' => $total_2000],
+        '₹500' => ['total' => $total_500],
+        '₹200' => ['total' => $total_200],
+        '₹100' => ['total' => $total_100],
+        '₹50' => ['total' => $total_50],
+        '₹20 Notes' => ['total' => $total_20_notes],
+        '₹20 Coins' => ['total' => $total_20_coins],
+        '₹10 Notes' => ['total' => $total_10_notes],
+        '₹10 Coins' => ['total' => $total_10_coins],
+        '₹5 Notes' => ['total' => $total_5_notes],
+        '₹5 Coins' => ['total' => $total_5_coins],
+        '₹2 Notes' => ['total' => $total_2_notes],
+        '₹2 Coins' => ['total' => $total_2_coins],
+        '₹1 Notes' => ['total' => $total_1_notes],
+        '₹1 Coins' => ['total' => $total_1_coins],
+    ];
+
+    $count_notes_coins_header = 'Notes/Coins';
+    // Apply filter if specified
+    if ($filter === 'all-coins') {
+        $denominations = array_filter($denominations, function ($key) {
+            return strpos($key, 'Coins') !== false;
+        }, ARRAY_FILTER_USE_KEY);
+        $count_notes_coins_header = 'Coins';
+    } elseif ($filter === 'all-notes') {
+        $denominations = array_filter($denominations, function ($key) {
+            return strpos($key, 'Coins') === false;
+        }, ARRAY_FILTER_USE_KEY);
+        $count_notes_coins_header = 'Notes';
+    }
+
+    $grandTotal = 0;
+    $table = '<table class="table table-bordered table-striped table-hover text-end">
+                <thead>
+                    <tr>
+                        <th>Denomination</th>
+                        <th>Count of ' . $count_notes_coins_header . '</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>';
+
+    foreach ($denominations as $denomination => $data) {
+        if ($data['total'] == 0) {
+            continue;  // Skip the current iteration and move to the next
+        }
+
+        $denom_value = (int)preg_replace('/\D/', '', $denomination);
+        $amount = $denom_value * (int)$data['total'];
+
+        $table .= "<tr>
+                        <td>{$denomination}</td>
+                        <td><strong>{$data['total']}</strong></td>
+                        <td><strong>" . htmlspecialchars($amount) . "</strong></td>
+                    </tr>";
+
+        $grandTotal += $amount;
+    }
+
+    $table .= "<tr>
+                    <td><strong>Total</strong></td>
+                    <td></td>
+                    <td><strong>" . htmlspecialchars($grandTotal) . "</strong></td>
+                </tr>
+            </tbody>
+        </table>";
+
+    return $table;
+}
+
+function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $grand_total_200 = 0, $grand_total_100 = 0, $grand_total_50 = 0, $grand_total_20_notes = 0, $grand_total_20_coins = 0, $grand_total_10_notes = 0, $grand_total_10_coins = 0, $grand_total_5_notes = 0, $grand_total_5_coins = 0, $grand_total_2_notes = 0, $grand_total_2_coins = 0, $grand_total_1_notes = 0, $grand_total_1_coins = 0, $grand_total_amount = 0, $filter = null)
+{
+    $denominations = [
+        '₹2000' => $grand_total_2000,
+        '₹500' => $grand_total_500,
+        '₹200' => $grand_total_200,
+        '₹100' => $grand_total_100,
+        '₹50' => $grand_total_50,
+        '₹20 Notes' => $grand_total_20_notes,
+        '₹20 Coins' => $grand_total_20_coins,
+        '₹10 Notes' => $grand_total_10_notes,
+        '₹10 Coins' => $grand_total_10_coins,
+        '₹5 Notes' => $grand_total_5_notes,
+        '₹5 Coins' => $grand_total_5_coins,
+        '₹2 Notes' => $grand_total_2_notes,
+        '₹2 Coins' => $grand_total_2_coins,
+        '₹1 Notes' => $grand_total_1_notes,
+        '₹1 Coins' => $grand_total_1_coins,
+    ];
+
+    $count_notes_coins_header = 'Notes/Coins';
+    if ($filter === 'all-coins') {
+        $denominations = array_filter($denominations, function ($key) {
+            return strpos($key, 'Coins') !== false;
+        }, ARRAY_FILTER_USE_KEY);
+        $count_notes_coins_header = 'Coins';
+    } elseif ($filter === 'all-notes') {
+        $denominations = array_filter($denominations, function ($key) {
+            return strpos($key, 'Coins') === false;
+        }, ARRAY_FILTER_USE_KEY);
+        $count_notes_coins_header = 'Notes';
+    }
+
+    $table = '<table class="table table-bordered table-striped table-hover text-end" >
+                <thead>
+                    <tr>
+                        <th>Denomination</th>
+                        <th>Count of ' . $count_notes_coins_header . '</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>';
+
+    $grand_total_amount = 0;
+    foreach ($denominations as $denomination => $total) {
+        if (!empty($total)) {
+            $denom_value = (int)preg_replace('/\D/', '', $denomination);
+            $amount = $total * $denom_value;
+
+            $table .= "<tr>
+                            <td>{$denomination}</td>
+                            <td><strong>{$total}</strong></td>
+                            <td><strong>{$amount}</strong></td>
+                        </tr>";
+            $grand_total_amount += $amount;
+        }
+    }
+
+    if (!empty($grand_total_amount)) {
+        $table .= "<tr>
+                        <td><strong>Grand Total</strong></td>
+                        <td></td>
+                        <td><strong>{$grand_total_amount}</strong></td>
+                    </tr>";
+    }
+
+    $table .= '</tbody></table>';
+
+    return $table;
+}
+?>
+
 <div class="container-fluid">
     <h3 style="text-align:center">Offerings Summary for <?php echo $service_date = (new DateTime($service_date))->format('d-m-Y') ?></h3>
 
@@ -145,7 +292,7 @@
                             // Add to grand totals
                             $grand_total_2000 += $detail['denomination_2000'];
                             $grand_total_500 += $detail['denomination_500'];
-                            $grand_total_200 += $total_200; // Ensure $total_200 is computed within the loop
+                            $grand_total_200 += $detail['denomination_200'];
                             $grand_total_100 += $detail['denomination_100'];
                             $grand_total_50 += $detail['denomination_50'];
                             $grand_total_20_notes += $detail['denomination_20_notes'];
@@ -187,58 +334,22 @@
                     </tfoot>
                 </table>
 
-                <table class="table table-bordered table-striped table-hover text-end" style="width: 500px;">
-                    <thead>
-                        <tr>
-                            <th>Denomination</th>
-                            <th>Count of Notes/Coins</th>
-                            <th>Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                <div class="row">
+                    <div class="col-md-4">
+                        <!-- <div class="service-header">Coins</div> -->
+                        <?php echo generateDenominationTable($total_2000, $total_500, $total_200, $total_100, $total_50, $total_20_notes, $total_20_coins, $total_10_notes, $total_10_coins, $total_5_notes, $total_5_coins, $total_2_notes, $total_2_coins, $total_1_notes, $total_1_coins, 'all-coins'); ?>
+                    </div>
+                    <div class="col-md-4">
+                        <!-- <div class="service-header">Notes</div> -->
+                        <?php echo generateDenominationTable($total_2000, $total_500, $total_200, $total_100, $total_50, $total_20_notes, $total_20_coins, $total_10_notes, $total_10_coins, $total_5_notes, $total_5_coins, $total_2_notes, $total_2_coins, $total_1_notes, $total_1_coins, 'all-notes'); ?>
+                    </div>
+                    <div class="col-md-4">
+                        <!-- <div class="service-header">Coins and Notes</div> -->
                         <?php
-                        // Array of denominations and their corresponding values
-                        $denominations = [
-                            '₹2000' => ['total' => $total_2000 ?? 0],
-                            '₹500' => ['total' => $total_500 ?? 0],
-                            '₹200' => ['total' => $total_200 ?? 0],
-                            '₹100' => ['total' => $total_100 ?? 0],
-                            '₹50' => ['total' => $total_50 ?? 0],
-                            '₹20 Notes' => ['total' => $total_20_notes ?? 0],
-                            '₹20 Coins' => ['total' => $total_20_coins ?? 0],
-                            '₹10 Notes' => ['total' => $total_10_notes ?? 0],
-                            '₹10 Coins' => ['total' => $total_10_coins ?? 0],
-                            '₹5 Notes' => ['total' => $total_5_notes ?? 0],
-                            '₹5 Coins' => ['total' => $total_5_coins ?? 0],
-                            '₹2 Notes' => ['total' => $total_2_notes ?? 0],
-                            '₹2 Coins' => ['total' => $total_2_coins ?? 0],
-                            '₹1 Notes' => ['total' => $total_1_notes ?? 0],
-                            '₹1 Coins' => ['total' => $total_1_coins ?? 0],
-                        ];
-
-                        $grandTotal = 0;
-                        foreach ($denominations as $denomination => $data) {
-                            if ($data['total'] == 0) {
-                                continue;  // Skip the current iteration and move to the next
-                            }
-                            $denom_value = (int) preg_replace('/\D/', '', $denomination);
-                            $amount = (int) $denom_value *  (int) $data['total'];
-                            echo "<tr>
-                            <td>{$denomination}</td>
-                            <td><strong>" . $data['total'] . "</strong></td>
-                            <td><strong>" . htmlspecialchars($amount) . "</strong></td>
-                          </tr>";
-                            $grandTotal += $amount;
-                        }
+                        echo generateDenominationTable($total_2000, $total_500, $total_200, $total_100, $total_50, $total_20_notes, $total_20_coins, $total_10_notes, $total_10_coins, $total_5_notes, $total_5_coins, $total_2_notes, $total_2_coins, $total_1_notes, $total_1_coins);
                         ?>
-                        <tr>
-                            <td><strong>Total</strong></td>
-                            <td></td>
-                            <td><strong><?= htmlspecialchars($grandTotal) ?></strong></td>
-                        </tr>
-                    </tbody>
-                </table>
-
+                    </div>
+                </div>
 
             <?php else: ?>
                 <p>No details found for this service.</p>
@@ -250,147 +361,25 @@
     <?php endif; ?>
 
 
-    <div class="mt-5 service-header" style="font-size: 25px;">Final Denomination Summary for <?php echo $service_date; ?></Summary>
+    <div class="mt-5 service-header" style="font-size: 25px;">
+        Final Denomination Summary for <?php echo $service_date; ?>
     </div>
-    <div class="d-flex justify-content-center">
-        <table class="table table-bordered table-striped table-hover text-end" style=" width: 500;">
-            <thead>
-                <tr>
-                    <th>Denomination</th>
-                    <th>Count of Notes/Coins</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (!empty($grand_total_2000)): ?>
-                    <tr>
-                        <td>₹2000</td>
-                        <td><strong><?= $grand_total_2000 ?></strong></td>
-                        <td><strong><?= $grand_total_2000 * 2000 ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php if (!empty($grand_total_500)): ?>
-                    <tr>
-                        <td>₹500</td>
-                        <td><strong><?= $grand_total_500 ?></strong></td>
-                        <td><strong><?= $grand_total_500 * 500 ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php if (!empty($grand_total_200)): ?>
-                    <tr>
-                        <td>₹200</td>
-                        <td><strong><?= $grand_total_200 ?></strong></td>
-                        <td><strong><?= $grand_total_200 * 200 ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php if (!empty($grand_total_100)): ?>
-                    <tr>
-                        <td>₹100</td>
-                        <td><strong><?= $grand_total_100 ?></strong></td>
-                        <td><strong><?= $grand_total_100 * 100 ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php if (!empty($grand_total_50)): ?>
-                    <tr>
-                        <td>₹50</td>
-                        <td><strong><?= $grand_total_50 ?></strong></td>
-                        <td><strong><?= $grand_total_50 * 50 ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php if (!empty($grand_total_20_notes)): ?>
-                    <tr>
-                        <td>₹20 Notes</td>
-                        <td><strong><?= $grand_total_20_notes ?></strong></td>
-                        <td><strong><?= $grand_total_20_notes * 20 ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php if (!empty($grand_total_20_coins)): ?>
-                    <tr>
-                        <td>₹20 Coins</td>
-                        <td><strong><?= $grand_total_20_coins ?></strong></td>
-                        <td><strong><?= $grand_total_20_coins * 20 ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php if (!empty($grand_total_10_notes)): ?>
-                    <tr>
-                        <td>₹10 Notes</td>
-                        <td><strong><?= $grand_total_10_notes ?></strong></td>
-                        <td><strong><?= $grand_total_10_notes * 10 ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php if (!empty($grand_total_10_coins)): ?>
-                    <tr>
-                        <td>₹10 Coins</td>
-                        <td><strong><?= $grand_total_10_coins ?></strong></td>
-                        <td><strong><?= $grand_total_10_coins * 10 ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php if (!empty($grand_total_5_notes)): ?>
-                    <tr>
-                        <td>₹5 Notes</td>
-                        <td><strong><?= $grand_total_5_notes ?></strong></td>
-                        <td><strong><?= $grand_total_5_notes * 5 ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php if (!empty($grand_total_5_coins)): ?>
-                    <tr>
-                        <td>₹5 Coins</td>
-                        <td><strong><?= $grand_total_5_coins ?></strong></td>
-                        <td><strong><?= $grand_total_5_coins * 5 ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php if (!empty($grand_total_2_notes)): ?>
-                    <tr>
-                        <td>₹2 Notes</td>
-                        <td><strong><?= $grand_total_2_notes ?></strong></td>
-                        <td><strong><?= $grand_total_2_notes * 2 ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php if (!empty($grand_total_2_coins)): ?>
-                    <tr>
-                        <td>₹2 Coins</td>
-                        <td><strong><?= $grand_total_2_coins ?></strong></td>
-                        <td><strong><?= $grand_total_2_coins * 2 ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php if (!empty($grand_total_1_notes)): ?>
-                    <tr>
-                        <td>₹1 Notes</td>
-                        <td><strong><?= $grand_total_1_notes ?></strong></td>
-                        <td><strong><?= $grand_total_1_notes * 1 ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php if (!empty($grand_total_1_coins)): ?>
-                    <tr>
-                        <td>₹1 Coins</td>
-                        <td><strong><?= $grand_total_1_coins ?></strong></td>
-                        <td><strong><?= $grand_total_1_coins * 1 ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-
-                <?php if (!empty($grand_total_amount)): ?>
-                    <tr>
-                        <td><strong>Grand Total</strong></td>
-                        <td></td>
-                        <td><strong><?= $grand_total_amount ?></strong></td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+    <div class="row">
+        <div class="col-md-4">
+            <?php
+            echo generateGrandTotalTable($grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'all-coins');
+            ?>
+        </div>
+        <div class="col-md-4">
+            <?php
+            echo generateGrandTotalTable($grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'all-notes');
+            ?>
+        </div>
+        <div class="col-md-4">
+            <?php
+            echo generateGrandTotalTable($grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount);
+            ?>
+        </div>
     </div>
 
 </div>

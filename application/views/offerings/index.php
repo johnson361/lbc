@@ -264,6 +264,11 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             if (e.key === "ArrowUp" || e.key === "ArrowDown" || e.key === "ArrowLeft" || e.key === "ArrowRight") {
                 return false; // Prevent default behavior for arrow keys
             }
+
+            //convert to upper case
+            const input = $(this);
+            input.val(input.val().toUpperCase());
+
             handleAutocompleteKeyup($(this), baseUrl);
         });
 
