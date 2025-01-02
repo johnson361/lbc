@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Offerings extends CI_Controller
+class Offg extends CI_Controller
 {
 
     public function __construct()
@@ -19,7 +19,7 @@ class Offerings extends CI_Controller
         $data['users'] = $this->User_model->get_all_users();
         if (!empty($serviceId) && !empty($serviceDate))
             $data['existing_data'] = $this->Offering_model->get_details_by_service($serviceId, $serviceDate);
-        $data['page_content'] = 'offerings/index';  // Path to the offerings view
+        $data['page_content'] = 'Offg/index';  // Path to the offerings view
         $this->load->view('layouts/navbar', $data);
         $this->load->view('layouts/main', $data);
     }
@@ -41,7 +41,7 @@ class Offerings extends CI_Controller
 
         $data['summary_data'] = $summary_data;
         $data['service_date'] = $service_date; // Pass the date for display if needed
-        $data['page_content'] = 'offerings/summary';
+        $data['page_content'] = 'Offg/summary';
 
         // Load the main layout and content
         $this->load->view('layouts/navbar', $data);

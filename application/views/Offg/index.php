@@ -8,7 +8,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
 ?>
 <div class="container-fluid">
     <!-- <h2>Offerings</h2> -->
-    <form method="POST" action="<?= site_url('offerings/save'); ?>">
+    <form method="POST" action="<?= site_url('Offg/save'); ?>">
 
         <div class="mt-2 mb-2 d-flex justify-content-end align-items-center">
             <!-- <label for="service_id" class="form-label mr-2">Select Service</label> -->
@@ -477,7 +477,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
 
             if (serviceId && serviceDate) {
                 const baseUrl = "<?php echo base_url(); ?>"; // Get the base URL from CodeIgniter
-                window.location.href = baseUrl + 'offerings/index/' + serviceId + '/' + mysqlDate;
+                window.location.href = baseUrl + 'Offg/index/' + serviceId + '/' + mysqlDate;
             }
         });
 
@@ -643,7 +643,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             console.log('Updated data', data);
 
             $.ajax({
-                url: '<?= site_url("offerings/update"); ?>', // Update to your AJAX handler
+                url: '<?= site_url("Offg/update"); ?>', // Update to your AJAX handler
                 method: 'POST',
                 data: {
                     data: data, // Send row data
@@ -700,7 +700,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             console.log('Updated data', data);
             // AJAX call to handle adding the row data
             $.ajax({
-                url: '<?= site_url("offerings/add"); ?>', // Update to your AJAX handler
+                url: '<?= site_url("Offg/add"); ?>', // Update to your AJAX handler
                 method: 'POST',
                 data: {
                     data: data, // Send row data
