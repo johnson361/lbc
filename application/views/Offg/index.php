@@ -42,7 +42,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                 <tr>
                     <th>SNO</th>
                     <th>Member</th>
-                    <th>2000 N</th>
+                    <th class="short_notes">2000 N</th>
                     <th>500 N</th>
                     <th>200 N</th>
                     <th>100 N</th>
@@ -78,7 +78,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                                     <ul class="suggestions"></ul>
                                 </div>
                             </td>
-                            <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_2000]" class="form-control denomination" value="<?= $data['denomination_2000'] ?? 0 ?>" required></td>
+                            <td class="short_notes"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_2000]" class="form-control denomination" value="<?= $data['denomination_2000'] ?? 0 ?>" required></td>
                             <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_500]" class="form-control denomination" value="<?= $data['denomination_500'] ?? 0 ?>" required></td>
                             <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_200]" class="form-control denomination" value="<?= $data['denomination_200'] ?? 0 ?>" required></td>
                             <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_100]" class="form-control denomination" value="<?= $data['denomination_100'] ?? 0 ?>" required></td>
@@ -114,7 +114,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                             <ul class="suggestions"></ul>
                         </div>
                     </td>
-                    <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_2000]" class="form-control denomination" value="0" required></td>
+                    <td class="short_notes"><input type="number" name="offerings[<?= $serialNo ?>][denomination_2000]" class="form-control denomination" value="0" required></td>
                     <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_500]" class="form-control denomination" value="0" required></td>
                     <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_200]" class="form-control denomination" value="0" required></td>
                     <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_100]" class="form-control denomination" value="0" required></td>
@@ -141,7 +141,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                 <tr id="totals-row">
                     <th id="count-rows"></th>
                     <th>Total</th>
-                    <th class="total-denomination" id="total-denomination-2000">-</th>
+                    <th class="total-denomination short_notes" id="total-denomination-2000">-</th>
                     <th class="total-denomination" id="total-denomination-500">-</th>
                     <th class="total-denomination" id="total-denomination-200">-</th>
                     <th class="total-denomination" id="total-denomination-100">-</th>

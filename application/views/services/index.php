@@ -21,7 +21,7 @@
                     <td><?= $service['service_slot'] ?></td>
                     <td>
                         <a href="<?= site_url('services/edit/'.$service['id']) ?>" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="<?= site_url('services/delete/'.$service['id']) ?>" class="btn btn-danger btn-sm">Delete</a>
+                        <a href="<?= site_url('services/delete/'.$service['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?')">Delete</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
