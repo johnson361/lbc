@@ -33,8 +33,8 @@ class Service_model extends CI_Model {
         return $this->db->update('services', $data);
     }
 
-    public function delete_service($id) {
-        $this->db->where('id', $id);
-        return $this->db->delete('services');
-    }
+    // public function delete_service($id) {
+    //     $this->db->where('id', $id);
+    //     return $this->db->delete('services');
+    // }
 }

@@ -27,10 +27,10 @@ class User_model extends CI_Model
     }
 
     // Delete a user
-    public function delete_user($id)
-    {
-        return $this->db->delete('users', ['id' => $id]);
-    }
+    // public function delete_user($id)
+    // {
+    //     return $this->db->delete('users', ['id' => $id]);
+    // }
 
     public function search_users($query)
     {

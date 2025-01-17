@@ -147,27 +147,27 @@ function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $g
 
 <div class="container-fluid">
     <h3 style="text-align:center">Offerings Summary for <?php echo $service_date = (new DateTime($service_date))->format('d-m-Y') ?></h3>
-
+    <?php
+    // Initialize grand totals for all services
+    $grand_total_2000 = 0;
+    $grand_total_500 = 0;
+    $grand_total_200 = 0;
+    $grand_total_100 = 0;
+    $grand_total_50 = 0;
+    $grand_total_20_notes = 0;
+    $grand_total_20_coins = 0;
+    $grand_total_10_notes = 0;
+    $grand_total_10_coins = 0;
+    $grand_total_5_notes = 0;
+    $grand_total_5_coins = 0;
+    $grand_total_2_notes = 0;
+    $grand_total_2_coins = 0;
+    $grand_total_1_notes = 0;
+    $grand_total_1_coins = 0;
+    $grand_total_amount = 0;
+    ?>
     <?php if (!empty($summary_data)): ?>
-        <?php
-        // Initialize grand totals for all services
-        $grand_total_2000 = 0;
-        $grand_total_500 = 0;
-        $grand_total_200 = 0;
-        $grand_total_100 = 0;
-        $grand_total_50 = 0;
-        $grand_total_20_notes = 0;
-        $grand_total_20_coins = 0;
-        $grand_total_10_notes = 0;
-        $grand_total_10_coins = 0;
-        $grand_total_5_notes = 0;
-        $grand_total_5_coins = 0;
-        $grand_total_2_notes = 0;
-        $grand_total_2_coins = 0;
-        $grand_total_1_notes = 0;
-        $grand_total_1_coins = 0;
-        $grand_total_amount = 0;
-        ?>
+
 
         <?php foreach ($summary_data as $item): ?>
             <!-- Header Section -->
