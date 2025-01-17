@@ -120,6 +120,10 @@
         display: none;
     }
 
+    .service_date_div {
+        display: none;
+    }
+
     .page-break {
         page-break-before: always;
     }

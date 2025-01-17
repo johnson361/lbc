@@ -42,7 +42,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                 <tr>
                     <th>SNO</th>
                     <th>Member</th>
-                    <th>2000 N</th>
+                    <th class="short_notes">2000 N</th>
                     <th>500 N</th>
                     <th>200 N</th>
                     <th>100 N</th>
@@ -71,14 +71,14 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                         <tr>
                             <td class="row-number"><?= $serialNo ?></td>
                             <td>
-                                <input type="hidden" name="offerings[<?= $serialNo ?>][id]" class="serial_no" value="<?= $data['id'] ?>" />
+                                <input type="hidden" name="offerings[<?= $serialNo ?>][id]" value="<?= $data['id'] ?>" />
                                 <input type="hidden" name="offerings[<?= $serialNo ?>][serial_no]" class="serial_no" value="<?= $serialNo ?>" />
                                 <div class="autocomplete-container">
                                     <input type="text" disabled class="form-select autocomplete_member" name="offerings[<?= $serialNo ?>][autocomplete_member]" value="<?= htmlspecialchars($data['full_name'] ?? '') ?>" placeholder="Start typing...">
                                     <ul class="suggestions"></ul>
                                 </div>
                             </td>
-                            <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_2000]" class="form-control denomination" value="<?= $data['denomination_2000'] ?? 0 ?>" required></td>
+                            <td class="short_notes"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_2000]" class="form-control denomination" value="<?= $data['denomination_2000'] ?? 0 ?>" required></td>
                             <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_500]" class="form-control denomination" value="<?= $data['denomination_500'] ?? 0 ?>" required></td>
                             <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_200]" class="form-control denomination" value="<?= $data['denomination_200'] ?? 0 ?>" required></td>
                             <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_100]" class="form-control denomination" value="<?= $data['denomination_100'] ?? 0 ?>" required></td>
@@ -94,9 +94,17 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                             <td class="short_notes"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_1_notes]" class="form-control denomination" value="<?= $data['denomination_1_notes'] ?? 0 ?>" required></td>
                             <td class="short_coins"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_1_coins]" class="form-control denomination" value="<?= $data['denomination_1_coins'] ?? 0 ?>" required></td>
                             <td><span class="total-amount"><?= $data['total_amount'] ?? 0 ?></span></td>
-                            <td>
+                            <td class="d-flex align-items-center">
                                 <button type="button" class="btn btn-success edit-offering">Edit</button>
-                                <button type="button" class="btn btn-success save-offering">Save</button>
+                                <button type="button" class="btn btn-success add-offering" style="display:none">Add</button>
+                                <button type="button" class="btn btn-success update-offering" style="display:none">Save</button>
+                                <div class="form-check">
+                                    <input class="form-check-input ms-1"
+                                        type="checkbox"
+                                        name="offerings[<?= $serialNo ?>][is_check]"
+                                        <?= (isset($data['is_check']) && $data['is_check'] == 1) ? 'checked' : '' ?>
+                                        <?= isset($data['is_check']) && $data['is_check'] == 1 ? 'disabled' : '' ?>>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -108,13 +116,14 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                 <tr>
                     <td class="row-number"><?= $serialNo ?></td>
                     <td>
+                        <input type="hidden" name="offerings[<?= $serialNo ?>][id]" class="row_id" />
                         <input type="hidden" name="offerings[<?= $serialNo ?>][serial_no]" class="serial_no" value="<?= $serialNo ?>" />
                         <div class="autocomplete-container">
                             <input type="text" class="form-select autocomplete_member" name="offerings[<?= $serialNo ?>][autocomplete_member]" placeholder="Start typing...">
                             <ul class="suggestions"></ul>
                         </div>
                     </td>
-                    <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_2000]" class="form-control denomination" value="0" required></td>
+                    <td class="short_notes"><input type="number" name="offerings[<?= $serialNo ?>][denomination_2000]" class="form-control denomination" value="0" required></td>
                     <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_500]" class="form-control denomination" value="0" required></td>
                     <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_200]" class="form-control denomination" value="0" required></td>
                     <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_100]" class="form-control denomination" value="0" required></td>
@@ -130,8 +139,13 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                     <td class="short_notes"><input type="number" name="offerings[<?= $serialNo ?>][denomination_1_notes]" class="form-control denomination" value="0" required></td>
                     <td class="short_coins"><input type="number" name="offerings[<?= $serialNo ?>][denomination_1_coins]" class="form-control denomination" value="0" required></td>
                     <td><span class="total-amount">0</span></td>
-                    <td>
+                    <td class="d-flex align-items-center">
+                        <button type="button" class="btn btn-success edit-offering" style="display:none">Edit</button>
                         <button type="button" class="btn btn-success add-offering">Add</button>
+                        <button type="button" class="btn btn-success update-offering" style="display:none">Save</button>
+                        <div class="form-check">
+                            <input class="form-check-input ms-1" type="checkbox" name="offerings[<?= $serialNo ?>][is_check]">
+                        </div>
                     </td>
                 </tr>
             </tbody>
@@ -141,7 +155,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                 <tr id="totals-row">
                     <th id="count-rows"></th>
                     <th>Total</th>
-                    <th class="total-denomination" id="total-denomination-2000">-</th>
+                    <th class="total-denomination short_notes" id="total-denomination-2000">-</th>
                     <th class="total-denomination" id="total-denomination-500">-</th>
                     <th class="total-denomination" id="total-denomination-200">-</th>
                     <th class="total-denomination" id="total-denomination-100">-</th>
@@ -578,10 +592,10 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             }, function(e) {
                 var delta = e.originalEvent.deltaY; // Get the scroll amount in the Y direction
                 if (delta > 0) {
-                    console.log("Scrolling down");
+                    // console.log("Scrolling down");
                     // Add custom logic for scrolling down
                 } else {
-                    console.log("Scrolling up");
+                    // console.log("Scrolling up");
                     // Add custom logic for scrolling up
                 }
             });
@@ -589,6 +603,10 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
 
         function addNewRow() {
             const newRow = $('tbody tr:first').clone();
+
+            //hide and show 
+            newRow.find('.edit-offering').hide();
+            newRow.find('.add-offering').css('display', 'block');
 
             newRow.find('input').not('.autocomplete_member').val(0); //excepet firt column
             newRow.find('.autocomplete_member').val(''); //set it to empty 
@@ -599,7 +617,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             newRow.find('.total-amount').text('0'); // Set total to 0 for the new row
 
             newRow.find('input').each(function() {
-                console.log('dddddddfxxx', $(this).attr('name'));
+                // console.log('dddddddfxxx', $(this).attr('name'));
                 const name = $(this).attr('name').replace('[1]', `[${rowCount}]`);
                 $(this).attr('name', name);
             });
@@ -614,33 +632,36 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
         } //add row
 
         $(document).on('click', '.edit-offering', function() {
-            console.log('edit offering');
             const row = $(this).closest('tr'); // Get the clicked row
             row.find('input, select').attr('readonly', false).prop('disabled', false);
             row.find('.edit-offering').hide(); // Hide the edit button
-            row.find('.save-offering').show();
+            row.find('.update-offering').show();
         });
 
-        $(document).on('click', '.save-offering', function() {
-            console.log('save offering');
+        $(document).on('click', '.update-offering', function() {
             const row = $(this).closest('tr'); // Get the clicked row
             row.find('input, select').attr('readonly', true).prop('disabled', true);
             row.find('.edit-offering').show(); // Hide the edit button
-            row.find('.save-offering').hide();
+            row.find('.update-offering').hide();
 
             const data = {};
 
             row.find('input').each(function() {
-                const name = $(this).attr('name'); // Get the input name
-                const value = $(this).val(); // Get the input value
+                let name = $(this).attr('name'); // Get the input name
+                let value = $(this).val(); // Get the input value
+
+                if ($(this).is(':checkbox')) {
+                    value = $(this).prop('checked') ? 1 : 0; // Set value to 1 if checked, 0 if unchecked
+                }
+
                 data[name] = value; // Add to the data object
             });
 
             const rowIndex = row.find('.row-number').text();
-            console.log('current_rowIndex', rowIndex);
+            // console.log('current_rowIndex', rowIndex);
             data[`offerings[${rowIndex}][service_id]`] = $('#service_id').val();
             data[`offerings[${rowIndex}][service_date]`] = $('#service_date').val();
-            console.log('Updated data', data);
+            // console.log('Updated data', data);
 
             $.ajax({
                 url: '<?= site_url("Offg/update"); ?>', // Update to your AJAX handler
@@ -650,7 +671,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                 },
                 dataType: 'json',
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                     if (response.success) {
                         PNotify.success({
                             title: 'Success!',
@@ -670,7 +691,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error('AJAX Error:', error);
+                    // console.error('AJAX Error:', error);
                     PNotify.error({
                         title: 'Error!',
                         text: error,
@@ -687,17 +708,22 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
 
             // Collect all input values from the row
             row.find('input').each(function() {
-                const name = $(this).attr('name'); // Get the input name
-                const value = $(this).val(); // Get the input value
+                let name = $(this).attr('name'); // Get the input name
+                let value = $(this).val(); // Get the input value
+
+                if ($(this).is(':checkbox')) {
+                    value = $(this).prop('checked') ? 1 : 0; // Set value to 1 if checked, 0 if unchecked
+                }
+
                 data[name] = value; // Add to the data object
             });
 
             const rowIndex = row.find('.row-number').text();
-            console.log('current_rowIndex', rowIndex);
+            // console.log('current_rowIndex', rowIndex);
             data[`offerings[${rowIndex}][service_id]`] = $('#service_id').val();
             data[`offerings[${rowIndex}][service_date]`] = $('#service_date').val();
 
-            console.log('Updated data', data);
+            // console.log('Updated data', data);
             // AJAX call to handle adding the row data
             $.ajax({
                 url: '<?= site_url("Offg/add"); ?>', // Update to your AJAX handler
@@ -707,7 +733,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                 },
                 dataType: 'json',
                 success: function(response) {
-                    console.log(response);
+                    // console.log(response);
                     if (response.success) {
                         PNotify.success({
                             title: 'Success!',
@@ -717,7 +743,9 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                         addNewRow();
                         row.find('ul.suggestions').remove(); //remove suggession if there are any
                         row.find('input, select').attr('readonly', true).prop('disabled', true);
-                        row.find('.add-offering').prop('disabled', true).addClass('disabled');
+                        row.find('.add-offering').prop('disabled', true).addClass('disabled').hide();
+                        row.find('.edit-offering').prop('disabled', false).removeClass('disabled').show();
+                        row.find('.row_id').val(response.row_id);
                     } else {
                         PNotify.error({
                             title: 'Error!',
@@ -727,7 +755,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                     }
                 },
                 error: function(xhr, status, error) {
-                    console.error('AJAX Error:', error);
+                    // console.error('AJAX Error:', error);
                     PNotify.error({
                         title: 'Error!',
                         text: error,
@@ -743,7 +771,11 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
         background-color: #d3d3d3;
     }
 
-    .save-offering {
+    .update-offering {
         display: none;
+    }
+
+    .form-check-input {
+        border: 1px solid green;
     }
 </style>

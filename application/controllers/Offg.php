@@ -80,9 +80,9 @@ class Offg extends CI_Controller
             return;
         }
 
-        $result = $this->Offering_model->add_offerings($data);
-        if ($result) {
-            echo json_encode(['success' => true, 'message' => 'Offering added successfully.']);
+        $row_id = $this->Offering_model->add_offerings($data);
+        if ($row_id) {
+            echo json_encode(['success' => true, 'message' => 'Offering added successfully.', 'row_id' =>  $row_id]);
         } else {
             echo json_encode(['success' => false, 'message' => 'Failed to add offering.']);
             return;
@@ -122,12 +122,14 @@ class Offg extends CI_Controller
         // echo "<pre>";
         // print_r($data);
         // exit;
-
+        //log_message('ERROR', 'Last DATA: ' . json_encode($data));
         $result = $this->Offering_model->update_offerings($data);
+        //log_message('ERROR', 'Last Query: ' . $this->db->last_query());
+
         if ($result) {
             echo json_encode(['success' => true, 'message' => 'Offering updated successfully.']);
         } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to add offering.']);
+            echo json_encode(['success' => false, 'message' => 'Failed to updated offering.']);
             return;
         }
     }

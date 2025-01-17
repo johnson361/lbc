@@ -147,6 +147,9 @@ function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $g
 
 <div class="container-fluid">
     <h3 style="text-align:center">Offerings Summary for <?php echo $service_date = (new DateTime($service_date))->format('d-m-Y') ?></h3>
+    <label style="float: right;" class="service_date_div">
+        <input type="date" id="service_date" name="service_date" class="form-control" placeholder="dd/mm/yyyy">
+    </label>
     <?php
     // Initialize grand totals for all services
     $grand_total_2000 = 0;
@@ -334,6 +337,70 @@ function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $g
                     </tfoot>
                 </table>
 
+                <?php /*
+                <!--
+                <table class="table table-bordered table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th class="text-end">SNo</th>
+                            <th>Name</th>
+                            <?php
+                            // Generate a list of columns dynamically based on all items
+                            $columns = [
+                                'denomination_2000' => '2000',
+                                'denomination_500' => '500',
+                                'denomination_200' => '200',
+                                'denomination_100' => '100',
+                                'denomination_50' => '50',
+                                'denomination_20_notes' => '20 N',
+                                'denomination_20_coins' => '20 C',
+                                'denomination_10_notes' => '10 N',
+                                'denomination_10_coins' => '10 C',
+                                'denomination_5_notes' => '5 N',
+                                'denomination_5_coins' => '5 C',
+                                'denomination_2_notes' => '2 N',
+                                'denomination_2_coins' => '2 C',
+                                'denomination_1_notes' => '1 N',
+                                'denomination_1_coins' => '1 C',
+                                'total_amount' => 'Total Amount'
+                            ];
+
+                            // Determine which columns should appear based on data
+                            $activeColumns = [];
+                            foreach ($columns as $key => $label) {
+                                foreach ($item['details'] as $detail) {
+                                    if (!empty($detail[$key])) {
+                                        $activeColumns[$key] = $label;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // Render the active columns
+                            foreach ($activeColumns as $label) {
+                                echo "<th class=\"text-end\">$label</th>";
+                            }
+                            ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($item['details'] as $detail): ?>
+                            <tr>
+                                <td class="text-end"><?= htmlspecialchars($detail['serial_no']) ?></td>
+                                <td><?= htmlspecialchars($detail['full_name']) ?></td>
+                                <?php
+                                // Render data for active columns
+                                foreach ($activeColumns as $key => $label) {
+                                    $value = !empty($detail[$key]) ? htmlspecialchars($detail[$key]) : '';
+                                    echo "<td class=\"text-end\">$value</td>";
+                                }
+                                ?>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                <?php */ ?>
+
                 <div class="row">
                     <div class="col-md-4">
                         <!-- <div class="service-header">Coins</div> -->
@@ -397,3 +464,22 @@ function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $g
         word-wrap: break-word;
     }
 </style>
+<script>
+    function convertToMySQLDate(dateString) {
+        const [day, month, year] = dateString.split('/');
+        return `${year}-${month}-${day}`;
+    }
+    $(document).ready(function() {
+        $('#service_date').on('change', function() {
+            console.log('change');
+            const serviceDate = $('#service_date').val();
+            console.log('change', serviceDate);
+
+            if (serviceDate) {
+                const baseUrl = "<?php echo base_url(); ?>"; // Get the base URL from CodeIgniter
+                window.location.href = baseUrl + 'Offg/summary/' + serviceDate;
+            }
+
+        });
+    });
+</script>

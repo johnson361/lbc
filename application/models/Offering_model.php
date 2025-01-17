@@ -25,7 +25,8 @@ class Offering_model extends CI_Model
         $this->db->insert('offerings', $data);
 
         if ($this->db->affected_rows() > 0) {
-            return true; // Success
+            // return true; // Success
+            return $this->db->insert_id();
         }
 
         return false; // Failure
