@@ -163,6 +163,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
     </label>
     <?php
     // Initialize grand totals for all services
+    $grand_total_checks_count = 0;
     $grand_total_check_amount = 0;
     $grand_total_2000 = 0;
     $grand_total_500 = 0;
