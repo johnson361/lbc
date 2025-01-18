@@ -467,8 +467,10 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
             echo generateGrandTotalTable($grand_total_check_amount, $grand_total_checks_count, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount);
             ?>
         </div>
+    </div>
 
-        <div class="col-md-12">
+    <div class="row">
+        <div class="col-md-4 offset-md-8">
             <?php
             echo generateGrandTotalTable($grand_total_check_amount, $grand_total_checks_count, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'include-check');
             ?>
@@ -508,4 +510,12 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
 
         });
     });
+
+    /************** when swithc back form different page i want to reload page************** */
+    document.addEventListener("visibilitychange", function() {
+        if (!document.hidden) {
+            location.reload();
+        }
+    });
+    /************** when swithc back form different page i want to reload page************** */
 </script>

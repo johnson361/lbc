@@ -104,7 +104,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                             <td><span class="total-amount"><?= $data['total_amount'] ?? 0 ?></span></td>
                             <td class="d-flex align-items-center">
                                 <button type="button" class="btn btn-success edit-offering">Edit</button>
-                                <button type="button" class="btn btn-success add-offering" style="display:none">Add</button>
+                                <button type="button" class="btn add-button add-offering" style="display:none">Add</button>
                                 <button type="button" class="btn btn-success update-offering" style="display:none">Save</button>
                                 <!-- <div class="form-check">
                                     <input class="form-check-input ms-1"
@@ -151,7 +151,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                     <td><span class="total-amount">0</span></td>
                     <td class="d-flex align-items-center">
                         <button type="button" class="btn btn-success edit-offering" style="display:none">Edit</button>
-                        <button type="button" class="btn btn-success add-offering">Add</button>
+                        <button type="button" class="btn add-button add-offering">Add</button>
                         <button type="button" class="btn btn-success update-offering" style="display:none">Save</button>
                         <!-- <div class="form-check">
                             <input class="form-check-input ms-1" type="checkbox" name="offerings[<?= $serialNo ?>][is_check]">
@@ -189,10 +189,10 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
         </table>
 
 
-        <div id="currency-total-table"></div>
+        <div id="currency-total-table" class="col-md-4" style=" float: right; "></div>
 
-        <!-- Add Row Button -->
-        <!-- <button type="button" class="btn btn-secondary" id="new-row">Add Row</button> -->
+        <!-- add Row Button -->
+        <!-- <button type="button" class="btn btn-secondary" id="new-row">add Row</button> -->
 
         <!-- Submit Button -->
         <!-- <button type="submit" class="btn btn-primary mt-3">Submit Offerings</button> -->
@@ -442,7 +442,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             $('.check_amount').each(function() {
                 const value = parseFloat($(this).val()); // Parse the input value as a float
                 if (!isNaN(value)) { // Ensure the value is a valid number
-                    check_total += value; // Add the value to the check_total
+                    check_total += value; // add the value to the check_total
                 }
                 $('#total-check-amount').text(check_total);
             });
@@ -488,16 +488,20 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                 // Only show rows with non-zero amounts
                 if (totalAmount > 0) {
                     tableHtml += `<tr><td>₹${denom.value} ${typeSymbol}</td><td>${totalCount}</td><td>₹${totalAmount}</td></tr>`;
-                    grandTotal += totalAmount; // Add to the grand total
+                    grandTotal += totalAmount; // add to the grand total
                 }
             });
+
+            // add the total amount row at the end
+            tableHtml += `<tr><td colspan="2"><strong>Total Cash Amount</strong></td><td><strong>₹${grandTotal}</strong></td></tr>`;
 
             total_check_amount = $('#total-check-amount').html();
             tableHtml += `<tr><td colspan="2"><strong>Check Amount</strong></td><td><strong>₹${total_check_amount}</strong></td></tr>`;
 
-
-            // Add the total amount row at the end
-            tableHtml += `<tr><td colspan="2"><strong>Total Amount</strong></td><td><strong>₹${grandTotal}</strong></td></tr>`;
+            grandTotal = parseFloat(grandTotal) || 0; // Default to 0 if undefined or not a number
+            total_check_amount = parseFloat(total_check_amount) || 0;
+            let final_grand_total = grandTotal + total_check_amount;
+            tableHtml += `<tr><td colspan="2"><strong>Final Grand Amount</strong></td><td><strong>₹${final_grand_total}</strong></td></tr>`;
 
             tableHtml += '</tbody></table>';
             $('#currency-total-table').html(tableHtml); // Assuming there's a container with ID 'currency-total-table' to append the table
@@ -514,12 +518,29 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             }
         });
 
-        // Add event listener to inputs for real-time total calculation
+        // function handleInputEvent(inputElement) {
+        //     const row = $(inputElement).closest('tr');
+        //     calculateTotal(row);
+        //     updateCurrencyTable();
+        // }
+
+        function handleInputEvent(inputElement) {
+            let row;
+            if (inputElement) {
+                row = $(inputElement).closest('tr');
+            } else {
+                row = $('table tr').first();
+            }
+            if (row.length) {
+                calculateTotal(row);
+            }
+            updateCurrencyTable(); // Update the entire table regardless
+        }
+
+        // add event listener to inputs for real-time total calculation
         $(document).on('input', 'input', function() {
             console.log('on input..');
-            const row = $(this).closest('tr');
-            calculateTotal(row);
-            updateCurrencyTable();
+            handleInputEvent(this);
         });
 
         $('#service_id').on('change', function() {
@@ -624,17 +645,17 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                 scrollTop: $(containerSelector).offset().top + $(containerSelector).height()
             }, duration);
 
-            // Add scroll event listener
+            // add scroll event listener
             $(window).on('wheel', {
                 passive: true
             }, function(e) {
                 var delta = e.originalEvent.deltaY; // Get the scroll amount in the Y direction
                 if (delta > 0) {
                     // console.log("Scrolling down");
-                    // Add custom logic for scrolling down
+                    // add custom logic for scrolling down
                 } else {
                     // console.log("Scrolling up");
-                    // Add custom logic for scrolling up
+                    // add custom logic for scrolling up
                 }
             });
         }
@@ -695,7 +716,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                     value = $(this).prop('checked') ? 1 : 0; // Set value to 1 if checked, 0 if unchecked
                 }
 
-                data[name] = value; // Add to the data object
+                data[name] = value; // add to the data object
             });
 
             const rowIndex = row.find('.row-number').text();
@@ -757,7 +778,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                     value = $(this).prop('checked') ? 1 : 0; // Set value to 1 if checked, 0 if unchecked
                 }
 
-                data[name] = value; // Add to the data object
+                data[name] = value; // add to the data object
             });
 
             const rowIndex = row.find('.row-number').text();
@@ -807,9 +828,10 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             });
         });
 
-        calculateColumnTotals();
-        updateCurrencyTable();
-    });  //ready 
+        // calculateTotal(row);
+
+        handleInputEvent();
+    }); //ready 
 </script>
 <style>
     .suggestions li.active {
@@ -822,5 +844,11 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
 
     .form-check-input {
         border: 1px solid green;
+    }
+
+    .add-button {
+        background-color: #28A71F;
+        border-color: #28A71F;
+        color: black;
     }
 </style>
