@@ -1,5 +1,5 @@
 <?php
-function generateDenominationTable($total_2000 = 0, $total_500 = 0, $total_200 = 0, $total_100 = 0, $total_50 = 0, $total_20_notes = 0, $total_20_coins = 0, $total_10_notes = 0, $total_10_coins = 0, $total_5_notes = 0, $total_5_coins = 0, $total_2_notes = 0, $total_2_coins = 0, $total_1_notes = 0, $total_1_coins = 0, $filter = null)
+function generateDenominationTable($total_check_amount = 0, $total_2000 = 0, $total_500 = 0, $total_200 = 0, $total_100 = 0, $total_50 = 0, $total_20_notes = 0, $total_20_coins = 0, $total_10_notes = 0, $total_10_coins = 0, $total_5_notes = 0, $total_5_coins = 0, $total_2_notes = 0, $total_2_coins = 0, $total_1_notes = 0, $total_1_coins = 0, $filter = null)
 {
     // Array of denominations and their corresponding values
     $denominations = [
@@ -73,7 +73,7 @@ function generateDenominationTable($total_2000 = 0, $total_500 = 0, $total_200 =
     return $table;
 }
 
-function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $grand_total_200 = 0, $grand_total_100 = 0, $grand_total_50 = 0, $grand_total_20_notes = 0, $grand_total_20_coins = 0, $grand_total_10_notes = 0, $grand_total_10_coins = 0, $grand_total_5_notes = 0, $grand_total_5_coins = 0, $grand_total_2_notes = 0, $grand_total_2_coins = 0, $grand_total_1_notes = 0, $grand_total_1_coins = 0, $grand_total_amount = 0, $filter = null)
+function generateGrandTotalTable($grand_total_check_amount = 0, $grand_total_2000 = 0, $grand_total_500 = 0, $grand_total_200 = 0, $grand_total_100 = 0, $grand_total_50 = 0, $grand_total_20_notes = 0, $grand_total_20_coins = 0, $grand_total_10_notes = 0, $grand_total_10_coins = 0, $grand_total_5_notes = 0, $grand_total_5_coins = 0, $grand_total_2_notes = 0, $grand_total_2_coins = 0, $grand_total_1_notes = 0, $grand_total_1_coins = 0, $grand_total_amount = 0, $filter = null)
 {
     $denominations = [
         '₹2000' => $grand_total_2000,
@@ -99,12 +99,12 @@ function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $g
             return strpos($key, 'Coins') !== false;
         }, ARRAY_FILTER_USE_KEY);
         $count_notes_coins_header = 'Coins';
-    } elseif ($filter === 'all-notes') {
+    } else if ($filter === 'all-notes') {
         $denominations = array_filter($denominations, function ($key) {
             return strpos($key, 'Coins') === false;
         }, ARRAY_FILTER_USE_KEY);
         $count_notes_coins_header = 'Notes';
-    }
+    } 
 
     $table = '<table class="table table-bordered table-striped table-hover text-end" >
                 <thead>
@@ -131,6 +131,14 @@ function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $g
         }
     }
 
+    if ($filter == 'include-check') {
+        $table .= "<tr>
+                        <td >Check Total</td>
+                        <td colspan='2'><strong>{$grand_total_check_amount}</strong></td>
+                    </tr>";
+        $grand_total_amount += $grand_total_check_amount;
+    }
+
     if (!empty($grand_total_amount)) {
         $table .= "<tr>
                         <td><strong>Grand Total</strong></td>
@@ -152,6 +160,7 @@ function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $g
     </label>
     <?php
     // Initialize grand totals for all services
+    $grand_total_check_amount = 0;
     $grand_total_2000 = 0;
     $grand_total_500 = 0;
     $grand_total_200 = 0;
@@ -179,6 +188,7 @@ function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $g
             <?php if (!empty($item['details'])): ?>
                 <?php
                 // Initialize totals for each denomination for this service
+                $total_check_amount = 0;
                 $total_2000 = 0;
                 $total_500 = 0;
                 $total_200 = 0;
@@ -201,6 +211,7 @@ function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $g
                         <tr>
                             <th class="text-end">SNo</th>
                             <th>Name</th>
+                            <th class="text-end">CHK</th>
                             <th class="text-end">2000</th>
                             <th class="text-end">500</th>
                             <th class="text-end">200</th>
@@ -224,6 +235,7 @@ function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $g
                             <tr>
                                 <td class="text-end"><span><?= htmlspecialchars($detail['serial_no']) ?></span></td>
                                 <td><span><?= htmlspecialchars($detail['full_name']) ?></span></td>
+                                <td class="text-end"><span><?= htmlspecialchars($detail['check_amount']) ?></span></td>
                                 <td class="text-end"><span class="<?= $detail['denomination_2000'] == 0 ? 'd-none' : '' ?>">
                                         <?= htmlspecialchars($detail['denomination_2000']) ?>
                                     </span></td>
@@ -275,6 +287,7 @@ function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $g
                             </tr>
                             <?php
                             // Add to service totals
+                            $total_check_amount += $detail['check_amount'];
                             $total_2000 += $detail['denomination_2000'];
                             $total_500 += $detail['denomination_500'];
                             $total_200 += $detail['denomination_200'];
@@ -293,6 +306,7 @@ function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $g
                             $total_amount += $detail['total_amount'];
 
                             // Add to grand totals
+                            $grand_total_check_amount += $detail['check_amount'];
                             $grand_total_2000 += $detail['denomination_2000'];
                             $grand_total_500 += $detail['denomination_500'];
                             $grand_total_200 += $detail['denomination_200'];
@@ -317,6 +331,7 @@ function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $g
                         <tr>
                             <td class="text-end"><strong>Total</strong></td>
                             <td></td>
+                            <td class="text-end"><span class="<?= $total_check_amount == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_check_amount) ?></strong></span></td>
                             <td class="text-end"><span class="<?= $total_2000 == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_2000) ?></strong></span></td>
                             <td class="text-end"><span class="<?= $total_500 == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_500) ?></strong></span></td>
                             <td class="text-end"><span class="<?= $total_200 == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_200) ?></strong></span></td>
@@ -404,16 +419,16 @@ function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $g
                 <div class="row">
                     <div class="col-md-4">
                         <!-- <div class="service-header">Coins</div> -->
-                        <?php echo generateDenominationTable($total_2000, $total_500, $total_200, $total_100, $total_50, $total_20_notes, $total_20_coins, $total_10_notes, $total_10_coins, $total_5_notes, $total_5_coins, $total_2_notes, $total_2_coins, $total_1_notes, $total_1_coins, 'all-coins'); ?>
+                        <?php echo generateDenominationTable($total_check_amount, $total_2000, $total_500, $total_200, $total_100, $total_50, $total_20_notes, $total_20_coins, $total_10_notes, $total_10_coins, $total_5_notes, $total_5_coins, $total_2_notes, $total_2_coins, $total_1_notes, $total_1_coins, 'all-coins'); ?>
                     </div>
                     <div class="col-md-4">
                         <!-- <div class="service-header">Notes</div> -->
-                        <?php echo generateDenominationTable($total_2000, $total_500, $total_200, $total_100, $total_50, $total_20_notes, $total_20_coins, $total_10_notes, $total_10_coins, $total_5_notes, $total_5_coins, $total_2_notes, $total_2_coins, $total_1_notes, $total_1_coins, 'all-notes'); ?>
+                        <?php echo generateDenominationTable($total_check_amount, $total_2000, $total_500, $total_200, $total_100, $total_50, $total_20_notes, $total_20_coins, $total_10_notes, $total_10_coins, $total_5_notes, $total_5_coins, $total_2_notes, $total_2_coins, $total_1_notes, $total_1_coins, 'all-notes'); ?>
                     </div>
                     <div class="col-md-4">
                         <!-- <div class="service-header">Coins and Notes</div> -->
                         <?php
-                        echo generateDenominationTable($total_2000, $total_500, $total_200, $total_100, $total_50, $total_20_notes, $total_20_coins, $total_10_notes, $total_10_coins, $total_5_notes, $total_5_coins, $total_2_notes, $total_2_coins, $total_1_notes, $total_1_coins);
+                        echo generateDenominationTable($total_check_amount, $total_2000, $total_500, $total_200, $total_100, $total_50, $total_20_notes, $total_20_coins, $total_10_notes, $total_10_coins, $total_5_notes, $total_5_coins, $total_2_notes, $total_2_coins, $total_1_notes, $total_1_coins);
                         ?>
                     </div>
                 </div>
@@ -428,23 +443,29 @@ function generateGrandTotalTable($grand_total_2000 = 0, $grand_total_500 = 0, $g
     <?php endif; ?>
 
 
-    <div class="mt-5 service-header" style="font-size: 25px;">
+    <div class="mt-5 service-header" style="font-size: 25px; background-color: gainsboro;">
         Final Denomination Summary for <?php echo $service_date; ?>
     </div>
     <div class="row">
         <div class="col-md-4">
             <?php
-            echo generateGrandTotalTable($grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'all-coins');
+            echo generateGrandTotalTable($grand_total_check_amount, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'all-coins');
             ?>
         </div>
         <div class="col-md-4">
             <?php
-            echo generateGrandTotalTable($grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'all-notes');
+            echo generateGrandTotalTable($grand_total_check_amount, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'all-notes');
             ?>
         </div>
         <div class="col-md-4">
             <?php
-            echo generateGrandTotalTable($grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount);
+            echo generateGrandTotalTable($grand_total_check_amount, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount);
+            ?>
+        </div>
+
+        <div class="col-md-12">
+            <?php
+            echo generateGrandTotalTable($grand_total_check_amount, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'include-check');
             ?>
         </div>
     </div>

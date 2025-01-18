@@ -20,7 +20,7 @@
                     <td><?= $user['phone'] ?></td>
                     <td>
                         <a href="<?= site_url('users/edit/'.$user['id']) ?>" class="btn btn-warning btn-sm">Edit</a>
-                        <a href="<?= site_url('users/delete/'.$user['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
+                        <!-- <a href="<?= site_url('users/delete/'.$user['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a> -->
                     </td>
                 </tr>
             <?php endforeach; ?>

@@ -15,10 +15,13 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
 
             <span class="<?= $tableClass ?>">
                 <label class="me-4">
-                    <input type="checkbox" id="short_coins_toggle"> Show Short Coins
+                    <input type="checkbox" id="short_coins_toggle"> Show Coins
+                </label>
+                <label class="me-4">
+                    <input type="checkbox" id="short_notes_toggle"> Show Rare Notes
                 </label>
                 <label class="me-5">
-                    <input type="checkbox" id="short_notes_toggle"> Show Short Notes
+                    <input type="checkbox" id="check_toggle"> Check
                 </label>
             </span>
 
@@ -42,6 +45,9 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                 <tr>
                     <th>SNO</th>
                     <th>Member</th>
+                    <th class="check_column">Check No</th>
+                    <th class="check_column">Check Amount</th>
+
                     <th class="short_notes">2000 N</th>
                     <th>500 N</th>
                     <th>200 N</th>
@@ -78,6 +84,8 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                                     <ul class="suggestions"></ul>
                                 </div>
                             </td>
+                            <td class="check_column"><input type="number" disabled name="offerings[<?= $serialNo ?>][check_no]" class="form-control" value="<?= $data['check_no'] ?? 0 ?>" required></td>
+                            <td class="check_column"><input type="number" disabled name="offerings[<?= $serialNo ?>][check_amount]" class="form-control check_amount" value="<?= $data['check_amount'] ?? 0 ?>" required></td>
                             <td class="short_notes"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_2000]" class="form-control denomination" value="<?= $data['denomination_2000'] ?? 0 ?>" required></td>
                             <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_500]" class="form-control denomination" value="<?= $data['denomination_500'] ?? 0 ?>" required></td>
                             <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_200]" class="form-control denomination" value="<?= $data['denomination_200'] ?? 0 ?>" required></td>
@@ -98,13 +106,13 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                                 <button type="button" class="btn btn-success edit-offering">Edit</button>
                                 <button type="button" class="btn btn-success add-offering" style="display:none">Add</button>
                                 <button type="button" class="btn btn-success update-offering" style="display:none">Save</button>
-                                <div class="form-check">
+                                <!-- <div class="form-check">
                                     <input class="form-check-input ms-1"
                                         type="checkbox"
                                         name="offerings[<?= $serialNo ?>][is_check]"
                                         <?= (isset($data['is_check']) && $data['is_check'] == 1) ? 'checked' : '' ?>
                                         <?= isset($data['is_check']) && $data['is_check'] == 1 ? 'disabled' : '' ?>>
-                                </div>
+                                </div> -->
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -123,6 +131,8 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                             <ul class="suggestions"></ul>
                         </div>
                     </td>
+                    <td class="check_column"><input type="number" name="offerings[<?= $serialNo ?>][check_no]" class="form-control" value="0" required></td>
+                    <td class="check_column"><input type="number" name="offerings[<?= $serialNo ?>][check_amount]" class="form-control check_amount" value="0" required></td>
                     <td class="short_notes"><input type="number" name="offerings[<?= $serialNo ?>][denomination_2000]" class="form-control denomination" value="0" required></td>
                     <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_500]" class="form-control denomination" value="0" required></td>
                     <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_200]" class="form-control denomination" value="0" required></td>
@@ -143,9 +153,9 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                         <button type="button" class="btn btn-success edit-offering" style="display:none">Edit</button>
                         <button type="button" class="btn btn-success add-offering">Add</button>
                         <button type="button" class="btn btn-success update-offering" style="display:none">Save</button>
-                        <div class="form-check">
+                        <!-- <div class="form-check">
                             <input class="form-check-input ms-1" type="checkbox" name="offerings[<?= $serialNo ?>][is_check]">
-                        </div>
+                        </div> -->
                     </td>
                 </tr>
             </tbody>
@@ -155,6 +165,9 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                 <tr id="totals-row">
                     <th id="count-rows"></th>
                     <th>Total</th>
+
+                    <th class="check_column">-</th>
+                    <th class="check_column" id="total-check-amount">-</th>
                     <th class="total-denomination short_notes" id="total-denomination-2000">-</th>
                     <th class="total-denomination" id="total-denomination-500">-</th>
                     <th class="total-denomination" id="total-denomination-200">-</th>
@@ -217,6 +230,13 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
         }
     });
 
+    $('#check_toggle').on('change', function() {
+        if ($(this).prop('checked')) {
+            $('.check_column').show();
+        } else {
+            $('.check_column').hide();
+        }
+    });
 
     $(document).ready(function() {
         smoothScrollAndHandleScroll('#offerings-container', 500);
@@ -416,6 +436,16 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                     columnTotal = '.';
                 $(`#total-${denom.replace(/_/g, '-')}`).text(columnTotal); // Update the column total in the footer
             });
+
+            let check_total = 0; // Initialize the total variable
+
+            $('.check_amount').each(function() {
+                const value = parseFloat($(this).val()); // Parse the input value as a float
+                if (!isNaN(value)) { // Ensure the value is a valid number
+                    check_total += value; // Add the value to the check_total
+                }
+                $('#total-check-amount').text(check_total);
+            });
         }
 
         // Function to calculate the grand total
@@ -462,6 +492,10 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                 }
             });
 
+            total_check_amount = $('#total-check-amount').html();
+            tableHtml += `<tr><td colspan="2"><strong>Check Amount</strong></td><td><strong>₹${total_check_amount}</strong></td></tr>`;
+
+
             // Add the total amount row at the end
             tableHtml += `<tr><td colspan="2"><strong>Total Amount</strong></td><td><strong>₹${grandTotal}</strong></td></tr>`;
 
@@ -474,11 +508,15 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             if ($(this).attr('name')?.includes('denomination')) {
                 $(this).val(''); // Clears the value of the input field
             }
+
+            if ($(this).attr('name')?.includes('check_no') || $(this).attr('name')?.includes('check_amount')) {
+                $(this).val(''); // Clears the value of the input field
+            }
         });
 
         // Add event listener to inputs for real-time total calculation
         $(document).on('input', 'input', function() {
-            // console.log('testing..');
+            console.log('on input..');
             const row = $(this).closest('tr');
             calculateTotal(row);
             updateCurrencyTable();
@@ -602,6 +640,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
         }
 
         function addNewRow() {
+            console.log('addNewRow');;
             const newRow = $('tbody tr:first').clone();
 
             //hide and show 
@@ -632,6 +671,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
         } //add row
 
         $(document).on('click', '.edit-offering', function() {
+            console.log('edit-offering');
             const row = $(this).closest('tr'); // Get the clicked row
             row.find('input, select').attr('readonly', false).prop('disabled', false);
             row.find('.edit-offering').hide(); // Hide the edit button
@@ -639,6 +679,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
         });
 
         $(document).on('click', '.update-offering', function() {
+            console.log('update-offering');
             const row = $(this).closest('tr'); // Get the clicked row
             row.find('input, select').attr('readonly', true).prop('disabled', true);
             row.find('.edit-offering').show(); // Hide the edit button
@@ -703,6 +744,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
         });
 
         $(document).on('click', '.add-offering', function() {
+            console.log('add-offering');
             const row = $(this).closest('tr'); // Get the clicked row
             const data = {}; // Initialize data object to store values
 
@@ -764,7 +806,10 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                 },
             });
         });
-    });
+
+        calculateColumnTotals();
+        updateCurrencyTable();
+    });  //ready 
 </script>
 <style>
     .suggestions li.active {

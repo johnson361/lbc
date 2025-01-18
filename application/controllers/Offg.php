@@ -153,7 +153,10 @@ class Offg extends CI_Controller
     function isValidDenomination($data)
     {
         foreach ($data as $key => $value) {
-            if (strpos($key, 'denomination') !== false && !empty($value)) {
+            // if (strpos($key, 'denomination') !== false && !empty($value)) {
+            if ((strpos($key, 'denomination') !== false && !empty($value))
+                || (!empty($data['check_no']) && !empty($data['check_amount']))
+            ) {
                 return true; // Return true if a non-empty denomination is found
             }
         }
