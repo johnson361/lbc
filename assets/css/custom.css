@@ -108,11 +108,34 @@
     background-color: #ffc1c1;
 }
 
+
 .short_coins,
 .short_notes {
     display: none;
 }
 
+
+.suggestions li.active {
+    background-color: #d3d3d3;
+}
+
+.update-offering {
+    display: none;
+}
+
+.form-check-input {
+    border: 1px solid green;
+}
+
+.add-button {
+    background-color: #28A71F;
+    border-color: #28A71F;
+    color: black;
+}
+
+.is-check {
+    background-color: #34a88a !important;
+}
 
 @media print {
     .navbar {

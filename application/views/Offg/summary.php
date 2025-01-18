@@ -235,9 +235,11 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($item['details'] as $detail): ?>
+                        <?php foreach ($item['details'] as $detail):
+                        $is_check_class = ($detail['check_amount'] > 0) ? 'is-check' : '';
+                        ?>
                             <tr>
-                                <td class="text-end"><span><?= htmlspecialchars($detail['serial_no']) ?></span></td>
+                                <td class="text-end  <?php echo $is_check_class; ?>"><span><?= htmlspecialchars($detail['serial_no']) ?></span></td>
                                 <td><span><?= htmlspecialchars($detail['full_name']) ?></span></td>
                                 <td class="text-end"><span><?= htmlspecialchars($detail['check_amount']) ?></span></td>
                                 <td class="text-end"><span class="<?= $detail['denomination_2000'] == 0 ? 'd-none' : '' ?>">

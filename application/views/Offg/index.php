@@ -21,7 +21,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                     <input type="checkbox" id="short_notes_toggle"> Show Rare Notes
                 </label>
                 <label class="me-5">
-                    <input type="checkbox" id="check_toggle"> Check
+                    <input type="checkbox" id="check_toggle" checked> Show Check
                 </label>
             </span>
 
@@ -74,9 +74,12 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                 if (!empty($existing_data)):
                     foreach ($existing_data as $index => $data):
                         $serialNo = $index + 1; // Increment serial number for each entry
+
+                        $is_check_class = ($data['check_amount'] > 0) ? 'is-check' : '';
+
                 ?>
                         <tr>
-                            <td class="row-number"><?= $serialNo ?></td>
+                            <td class="row-number <?php echo $is_check_class; ?>"><?= $serialNo ?></td>
                             <td>
                                 <input type="hidden" name="offerings[<?= $serialNo ?>][id]" value="<?= $data['id'] ?>" />
                                 <input type="hidden" name="offerings[<?= $serialNo ?>][serial_no]" class="serial_no" value="<?= $serialNo ?>" />
@@ -85,7 +88,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                                     <ul class="suggestions"></ul>
                                 </div>
                             </td>
-                            
+
                             <td class="short_notes"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_2000]" class="form-control denomination" value="<?= $data['denomination_2000'] ?? 0 ?>" required></td>
                             <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_500]" class="form-control denomination" value="<?= $data['denomination_500'] ?? 0 ?>" required></td>
                             <td><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_200]" class="form-control denomination" value="<?= $data['denomination_200'] ?? 0 ?>" required></td>
@@ -103,7 +106,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                             <td class="short_coins"><input type="number" disabled name="offerings[<?= $serialNo ?>][denomination_1_coins]" class="form-control denomination" value="<?= $data['denomination_1_coins'] ?? 0 ?>" required></td>
                             <td class="check_column"><input type="number" disabled name="offerings[<?= $serialNo ?>][check_no]" class="form-control" value="<?= $data['check_no'] ?? 0 ?>" required></td>
                             <td class="check_column"><input type="number" disabled name="offerings[<?= $serialNo ?>][check_amount]" class="form-control check_amount" value="<?= $data['check_amount'] ?? 0 ?>" required></td>
-                            <td><span class="total-amount"><?= $data['total_amount'] ?? 0 ?></span></td>
+                            <td class="total-amount-col <?php echo $is_check_class; ?>"><span class="total-amount "><?= $data['total_amount'] ?? 0 ?></span></td>
                             <td class="d-flex align-items-center">
                                 <button type="button" class="btn btn-success edit-offering">Edit</button>
                                 <button type="button" class="btn add-button add-offering" style="display:none">Add</button>
@@ -133,7 +136,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                             <ul class="suggestions"></ul>
                         </div>
                     </td>
-                    
+
                     <td class="short_notes"><input type="number" name="offerings[<?= $serialNo ?>][denomination_2000]" class="form-control denomination" value="0" required></td>
                     <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_500]" class="form-control denomination" value="0" required></td>
                     <td><input type="number" name="offerings[<?= $serialNo ?>][denomination_200]" class="form-control denomination" value="0" required></td>
@@ -151,7 +154,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                     <td class="short_coins"><input type="number" name="offerings[<?= $serialNo ?>][denomination_1_coins]" class="form-control denomination" value="0" required></td>
                     <td class="check_column"><input type="number" name="offerings[<?= $serialNo ?>][check_no]" class="form-control" value="0" required></td>
                     <td class="check_column"><input type="number" name="offerings[<?= $serialNo ?>][check_amount]" class="form-control check_amount" value="0" required></td>
-                    <td><span class="total-amount">0</span></td>
+                    <td class="total-amount-col"><span class="total-amount">0</span></td>
                     <td class="d-flex align-items-center">
                         <button type="button" class="btn btn-success edit-offering" style="display:none">Edit</button>
                         <button type="button" class="btn add-button add-offering">Add</button>
@@ -667,6 +670,8 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             const newRow = $('tbody tr:first').clone();
 
             //hide and show 
+            newRow.find('td').removeClass('is-check');
+
             newRow.find('.edit-offering').hide();
             newRow.find('.add-offering').css('display', 'block');
 
@@ -746,6 +751,15 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                         row.find('ul.suggestions').remove(); //remove suggession if there are any
                         row.find('input, select').attr('readonly', true).prop('disabled', true);
                         // row.find('.add-offering').prop('disabled', true).addClass('disabled');
+
+                        const checkAmount = parseFloat(row.find('.check_amount').val());
+                        if (checkAmount > 0) {
+                            row.find('.row-number').addClass('is-check');
+                            row.find('.total-amount-col').addClass('is-check');
+                        } else {
+                            row.find('.row-number').removeClass('is-check');
+                            row.find('.total-amount-col').removeClass('is-check');
+                        }
                     } else {
                         PNotify.error({
                             title: 'Error!',
@@ -811,6 +825,15 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                         row.find('.add-offering').prop('disabled', true).addClass('disabled').hide();
                         row.find('.edit-offering').prop('disabled', false).removeClass('disabled').show();
                         row.find('.row_id').val(response.row_id);
+
+                        const checkAmount = parseFloat(row.find('.check_amount').val());
+                        if (checkAmount > 0) {
+                            row.find('.row-number').addClass('is-check');
+                            row.find('.total-amount-col').addClass('is-check');
+                        } else {
+                            row.find('.row-number').removeClass('is-check');
+                            row.find('.total-amount-col').removeClass('is-check');
+                        }
                     } else {
                         PNotify.error({
                             title: 'Error!',
@@ -836,21 +859,5 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
     }); //ready 
 </script>
 <style>
-    .suggestions li.active {
-        background-color: #d3d3d3;
-    }
-
-    .update-offering {
-        display: none;
-    }
-
-    .form-check-input {
-        border: 1px solid green;
-    }
-
-    .add-button {
-        background-color: #28A71F;
-        border-color: #28A71F;
-        color: black;
-    }
+  
 </style>
