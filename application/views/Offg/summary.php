@@ -1,5 +1,5 @@
 <?php
-function generateDenominationTable($total_check_amount = 0, $total_2000 = 0, $total_500 = 0, $total_200 = 0, $total_100 = 0, $total_50 = 0, $total_20_notes = 0, $total_20_coins = 0, $total_10_notes = 0, $total_10_coins = 0, $total_5_notes = 0, $total_5_coins = 0, $total_2_notes = 0, $total_2_coins = 0, $total_1_notes = 0, $total_1_coins = 0, $filter = null)
+function generateDenominationTable($total_check_amount = 0, $total_checks_count = 0, $total_2000 = 0, $total_500 = 0, $total_200 = 0, $total_100 = 0, $total_50 = 0, $total_20_notes = 0, $total_20_coins = 0, $total_10_notes = 0, $total_10_coins = 0, $total_5_notes = 0, $total_5_coins = 0, $total_2_notes = 0, $total_2_coins = 0, $total_1_notes = 0, $total_1_coins = 0, $filter = null)
 {
     // Array of denominations and their corresponding values
     $denominations = [
@@ -60,6 +60,15 @@ function generateDenominationTable($total_check_amount = 0, $total_2000 = 0, $to
                     </tr>";
 
         $grandTotal += $amount;
+    }
+
+    if ($filter == 'include-check') {
+        $table .= "<tr>
+                        <td >Check Total</td>
+                        <td><strong>{$total_checks_count}</strong></td>                        
+                        <td colspan='2' class='" . ($total_check_amount > 0 ? 'is-check' : '') . "'><strong>{$total_check_amount}</strong></td>
+                    </tr>";
+        $grandTotal += $total_check_amount;
     }
 
     $table .= "<tr>
@@ -192,6 +201,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
             <?php if (!empty($item['details'])): ?>
                 <?php
                 // Initialize totals for each denomination for this service
+                $total_checks_count = 0;
                 $total_check_amount = 0;
                 $total_2000 = 0;
                 $total_500 = 0;
@@ -215,8 +225,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                         <tr>
                             <th class="text-end">SNo</th>
                             <th>Name</th>
-                            <th class="text-end">CHK</th>
-                            <th class="text-end">2000</th>
+                            <th class="text-end very-rare-notes">2000</th>
                             <th class="text-end">500</th>
                             <th class="text-end">200</th>
                             <th class="text-end">100</th>
@@ -225,24 +234,24 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                             <th class="text-end">20 C</th>
                             <th class="text-end">10 N</th>
                             <th class="text-end">10 C</th>
-                            <th class="text-end">5 N</th>
+                            <th class="text-end very-rare-notes">5 N</th>
                             <th class="text-end">5 C</th>
-                            <th class="text-end">2 N</th>
+                            <th class="text-end very-rare-notes">2 N</th>
                             <th class="text-end">2 C</th>
-                            <th class="text-end">1 N</th>
+                            <th class="text-end very-rare-notes">1 N</th>
                             <th class="text-end">1 C</th>
+                            <th class="text-end">CHK</th>
                             <th class="text-end">Total Amount</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($item['details'] as $detail):
-                        $is_check_class = ($detail['check_amount'] > 0) ? 'is-check' : '';
+                            $is_check_class = ($detail['check_amount'] > 0) ? 'is-check' : '';
                         ?>
                             <tr>
                                 <td class="text-end  <?php echo $is_check_class; ?>"><span><?= htmlspecialchars($detail['serial_no']) ?></span></td>
                                 <td><span><?= htmlspecialchars($detail['full_name']) ?></span></td>
-                                <td class="text-end"><span><?= htmlspecialchars($detail['check_amount']) ?></span></td>
-                                <td class="text-end"><span class="<?= $detail['denomination_2000'] == 0 ? 'd-none' : '' ?>">
+                                <td class="text-end very-rare-notes"><span class="<?= $detail['denomination_2000'] == 0 ? 'd-none' : '' ?>">
                                         <?= htmlspecialchars($detail['denomination_2000']) ?>
                                     </span></td>
                                 <td class="text-end"><span class="<?= $detail['denomination_500'] == 0 ? 'd-none' : '' ?>">
@@ -269,30 +278,32 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                                 <td class="text-end"><span class="<?= $detail['denomination_10_coins'] == 0 ? 'd-none' : '' ?>">
                                         <?= htmlspecialchars($detail['denomination_10_coins']) ?>
                                     </span></td>
-                                <td class="text-end"><span class="<?= $detail['denomination_5_notes'] == 0 ? 'd-none' : '' ?>">
+                                <td class="text-end very-rare-notes"><span class="<?= $detail['denomination_5_notes'] == 0 ? 'd-none' : '' ?>">
                                         <?= htmlspecialchars($detail['denomination_5_notes']) ?>
                                     </span></td>
                                 <td class="text-end"><span class="<?= $detail['denomination_5_coins'] == 0 ? 'd-none' : '' ?>">
                                         <?= htmlspecialchars($detail['denomination_5_coins']) ?>
                                     </span></td>
-                                <td class="text-end"><span class="<?= $detail['denomination_2_notes'] == 0 ? 'd-none' : '' ?>">
+                                <td class="text-end very-rare-notes"><span class="<?= $detail['denomination_2_notes'] == 0 ? 'd-none' : '' ?>">
                                         <?= htmlspecialchars($detail['denomination_2_notes']) ?>
                                     </span></td>
                                 <td class="text-end"><span class="<?= $detail['denomination_2_coins'] == 0 ? 'd-none' : '' ?>">
                                         <?= htmlspecialchars($detail['denomination_2_coins']) ?>
                                     </span></td>
-                                <td class="text-end"><span class="<?= $detail['denomination_1_notes'] == 0 ? 'd-none' : '' ?>">
+                                <td class="text-end very-rare-notes"><span class="<?= $detail['denomination_1_notes'] == 0 ? 'd-none' : '' ?>">
                                         <?= htmlspecialchars($detail['denomination_1_notes']) ?>
                                     </span></td>
                                 <td class="text-end"><span class="<?= $detail['denomination_1_coins'] == 0 ? 'd-none' : '' ?>">
                                         <?= htmlspecialchars($detail['denomination_1_coins']) ?>
                                     </span></td>
+                                <td class="text-end"><span><?= htmlspecialchars($detail['check_amount']) ?></span></td>
                                 <td class="text-end"><span class="<?= $detail['total_amount'] == 0 ? 'd-none' : '' ?>">
                                         <?= htmlspecialchars($detail['total_amount']) ?>
                                     </span></td>
                             </tr>
                             <?php
                             // Add to service totals
+                            $total_checks_count += ($detail['check_amount'] > 0) ? 1 : 0;
                             $total_check_amount += $detail['check_amount'];
                             $total_2000 += $detail['denomination_2000'];
                             $total_500 += $detail['denomination_500'];
@@ -338,104 +349,41 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                         <tr>
                             <td class="text-end"><strong>Total</strong></td>
                             <td></td>
-                            <td class="text-end"><span class="<?= $total_check_amount == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_check_amount) ?></strong></span></td>
-                            <td class="text-end"><span class="<?= $total_2000 == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_2000) ?></strong></span></td>
+                            <td class="text-end very-rare-notes"><span class="<?= $total_2000 == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_2000) ?></strong></span></td>
                             <td class="text-end"><span class="<?= $total_500 == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_500) ?></strong></span></td>
                             <td class="text-end"><span class="<?= $total_200 == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_200) ?></strong></span></td>
                             <td class="text-end"><span class="<?= $total_100 == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_100) ?></strong></span></td>
                             <td class="text-end"><span class="<?= $total_50 == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_50) ?></strong></span></td>
                             <td class="text-end"><span class="<?= $total_20_notes == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_20_notes) ?></strong></span></td>
                             <td class="text-end"><span class="<?= $total_20_coins == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_20_coins) ?></strong></span></td>
-                            <td class="text-end"><span class="<?= $total_10_notes == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_10_notes) ?></strong></span></td>
+                            <td class="text-end "><span class="<?= $total_10_notes == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_10_notes) ?></strong></span></td>
                             <td class="text-end"><span class="<?= $total_10_coins == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_10_coins) ?></strong></span></td>
-                            <td class="text-end"><span class="<?= $total_5_notes == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_5_notes) ?></strong></span></td>
+                            <td class="text-end very-rare-notes"><span class="<?= $total_5_notes == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_5_notes) ?></strong></span></td>
                             <td class="text-end"><span class="<?= $total_5_coins == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_5_coins) ?></strong></span></td>
-                            <td class="text-end"><span class="<?= $total_2_notes == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_2_notes) ?></strong></span></td>
+                            <td class="text-end very-rare-notes"><span class="<?= $total_2_notes == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_2_notes) ?></strong></span></td>
                             <td class="text-end"><span class="<?= $total_2_coins == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_2_coins) ?></strong></span></td>
-                            <td class="text-end"><span class="<?= $total_1_notes == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_1_notes) ?></strong></span></td>
+                            <td class="text-end very-rare-notes"><span class="<?= $total_1_notes == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_1_notes) ?></strong></span></td>
                             <td class="text-end"><span class="<?= $total_1_coins == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_1_coins) ?></strong></span></td>
-                            <td class="text-end"><span class="<?= $total_amount == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_amount) ?></strong></span></td>
+                            <td class="text-end <?= $total_check_amount > 0 ? 'is-check' : '' ?>"><span class="<?= $total_check_amount == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_check_amount) ?></strong></span></td>
+                            <td class="text-end">CASH<span class="<?= $total_amount == 0 ? 'd-none' : '' ?>"><strong>
+                                        <?= htmlspecialchars($total_amount) ?> <br><span class="<?= $total_check_amount > 0 ? 'is-check' : '' ?>"> Including CHK : <?= htmlspecialchars($total_check_amount + $total_amount) ?> </strong></span></span></td>
                         </tr>
                     </tfoot>
                 </table>
 
-                <?php /*
-                <!--
-                <table class="table table-bordered table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th class="text-end">SNo</th>
-                            <th>Name</th>
-                            <?php
-                            // Generate a list of columns dynamically based on all items
-                            $columns = [
-                                'denomination_2000' => '2000',
-                                'denomination_500' => '500',
-                                'denomination_200' => '200',
-                                'denomination_100' => '100',
-                                'denomination_50' => '50',
-                                'denomination_20_notes' => '20 N',
-                                'denomination_20_coins' => '20 C',
-                                'denomination_10_notes' => '10 N',
-                                'denomination_10_coins' => '10 C',
-                                'denomination_5_notes' => '5 N',
-                                'denomination_5_coins' => '5 C',
-                                'denomination_2_notes' => '2 N',
-                                'denomination_2_coins' => '2 C',
-                                'denomination_1_notes' => '1 N',
-                                'denomination_1_coins' => '1 C',
-                                'total_amount' => 'Total Amount'
-                            ];
-
-                            // Determine which columns should appear based on data
-                            $activeColumns = [];
-                            foreach ($columns as $key => $label) {
-                                foreach ($item['details'] as $detail) {
-                                    if (!empty($detail[$key])) {
-                                        $activeColumns[$key] = $label;
-                                        break;
-                                    }
-                                }
-                            }
-
-                            // Render the active columns
-                            foreach ($activeColumns as $label) {
-                                echo "<th class=\"text-end\">$label</th>";
-                            }
-                            ?>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($item['details'] as $detail): ?>
-                            <tr>
-                                <td class="text-end"><?= htmlspecialchars($detail['serial_no']) ?></td>
-                                <td><?= htmlspecialchars($detail['full_name']) ?></td>
-                                <?php
-                                // Render data for active columns
-                                foreach ($activeColumns as $key => $label) {
-                                    $value = !empty($detail[$key]) ? htmlspecialchars($detail[$key]) : '';
-                                    echo "<td class=\"text-end\">$value</td>";
-                                }
-                                ?>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-                <?php */ ?>
-
                 <div class="row">
                     <div class="col-md-4">
                         <!-- <div class="service-header">Coins</div> -->
-                        <?php echo generateDenominationTable($total_check_amount, $total_2000, $total_500, $total_200, $total_100, $total_50, $total_20_notes, $total_20_coins, $total_10_notes, $total_10_coins, $total_5_notes, $total_5_coins, $total_2_notes, $total_2_coins, $total_1_notes, $total_1_coins, 'all-coins'); ?>
+                        <?php echo generateDenominationTable($total_check_amount, $total_checks_count, $total_2000, $total_500, $total_200, $total_100, $total_50, $total_20_notes, $total_20_coins, $total_10_notes, $total_10_coins, $total_5_notes, $total_5_coins, $total_2_notes, $total_2_coins, $total_1_notes, $total_1_coins, 'all-coins'); ?>
                     </div>
                     <div class="col-md-4">
                         <!-- <div class="service-header">Notes</div> -->
-                        <?php echo generateDenominationTable($total_check_amount, $total_2000, $total_500, $total_200, $total_100, $total_50, $total_20_notes, $total_20_coins, $total_10_notes, $total_10_coins, $total_5_notes, $total_5_coins, $total_2_notes, $total_2_coins, $total_1_notes, $total_1_coins, 'all-notes'); ?>
+                        <?php echo generateDenominationTable($total_check_amount, $total_checks_count, $total_2000, $total_500, $total_200, $total_100, $total_50, $total_20_notes, $total_20_coins, $total_10_notes, $total_10_coins, $total_5_notes, $total_5_coins, $total_2_notes, $total_2_coins, $total_1_notes, $total_1_coins, 'all-notes'); ?>
                     </div>
                     <div class="col-md-4">
                         <!-- <div class="service-header">Coins and Notes</div> -->
                         <?php
-                        echo generateDenominationTable($total_check_amount, $total_2000, $total_500, $total_200, $total_100, $total_50, $total_20_notes, $total_20_coins, $total_10_notes, $total_10_coins, $total_5_notes, $total_5_coins, $total_2_notes, $total_2_coins, $total_1_notes, $total_1_coins);
+                        echo generateDenominationTable($total_check_amount, $total_checks_count, $total_2000, $total_500, $total_200, $total_100, $total_50, $total_20_notes, $total_20_coins, $total_10_notes, $total_10_coins, $total_5_notes, $total_5_coins, $total_2_notes, $total_2_coins, $total_1_notes, $total_1_coins, 'include-check');
                         ?>
                     </div>
                 </div>
@@ -493,6 +441,8 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
         /* Set the desired fixed width */
         word-wrap: break-word;
     }
+
+    .include_check {}
 </style>
 <script>
     function convertToMySQLDate(dateString) {
