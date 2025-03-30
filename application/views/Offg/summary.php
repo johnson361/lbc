@@ -166,7 +166,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
 ?>
 
 <div class="container-fluid">
-    <h3 style="text-align:center">Offerings Summary for <?php echo $service_date = (new DateTime($service_date))->format('d-m-Y') ?></h3>
+    <h3 style="text-align:center">Offerings Summary for <?php $service_date = (new DateTime($service_date))->format('d-m-Y') ?></h3>
     <label style="float: right;" class="service_date_div">
         <input type="date" id="service_date" name="service_date" class="form-control" placeholder="dd/mm/yyyy">
     </label>
@@ -190,15 +190,24 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
     $grand_total_1_notes = 0;
     $grand_total_1_coins = 0;
     $grand_total_amount = 0;
+    // $grand_total_thanks_amount = 0;
+    // $grand_total_tithe_amount = 0;
     ?>
     <?php if (!empty($summary_data)): ?>
 
 
         <?php foreach ($summary_data as $item): ?>
             <!-- Header Section -->
-            <div class="mt-4 service-header">Service: <?= htmlspecialchars($item['header']['service_name']) ?></div>
+            <div class="mt-4 service-header">Service: <?php
+                                                        $service_name = htmlspecialchars($item['header']['service_name']);
+                                                        echo $service_name = str_replace([' - N/A', 'N/A - '], '', $service_name);
+                                                        ?></div>
             <!-- Detail Table -->
-            <?php if (!empty($item['details'])): ?>
+            <?php
+            //echo "<pre>";
+            //print_r($item['details']);
+            //exit;
+            if (!empty($item['details'])): ?>
                 <?php
                 // Initialize totals for each denomination for this service
                 $total_checks_count = 0;
@@ -245,7 +254,11 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($item['details'] as $detail):
+                        <?php
+                        //echo "<pre>";
+                        //echo print_r($item['details']);
+                        //exit;
+                        foreach ($item['details'] as $detail):
                             $is_check_class = ($detail['check_amount'] > 0) ? 'is-check' : '';
                         ?>
                             <tr>
@@ -322,6 +335,12 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                             $total_1_coins += $detail['denomination_1_coins'];
                             $total_amount += $detail['total_amount'];
 
+                            // if ($detail['offering_type_id'] == 1) { //tithe
+                            //     $grand_total_tithe_amount += $detail['total_amount'];
+                            // } else if ($detail['offering_type_id'] == 3) { //tithe
+                            //     $grand_total_thanks_amount += $detail['total_amount'];
+                            // }
+
                             // Add to grand totals
                             $grand_total_checks_count += ($detail['check_amount'] > 0) ? 1 : 0;
                             $grand_total_check_amount += $detail['check_amount'];
@@ -366,7 +385,17 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                             <td class="text-end"><span class="<?= $total_1_coins == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_1_coins) ?></strong></span></td>
                             <td class="text-end <?= $total_check_amount > 0 ? 'is-check' : '' ?>"><span class="<?= $total_check_amount == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_check_amount) ?></strong></span></td>
                             <td class="text-end">CASH<span class="<?= $total_amount == 0 ? 'd-none' : '' ?>"><strong>
-                                        <?= htmlspecialchars($total_amount) ?> <br><span class="<?= $total_check_amount > 0 ? 'is-check' : '' ?>"> Including CHK : <?= htmlspecialchars($total_check_amount + $total_amount) ?> </strong></span></span></td>
+                                        <?= htmlspecialchars($total_amount) ?> <br><span class="<?= $total_check_amount > 0 ? 'is-check' : '' ?>"> Including CHK :
+                                            <?php $including_check_total =  htmlspecialchars($total_check_amount + $total_amount);
+                                            echo $including_check_total;
+
+                                            $final_summary_services[] = array(
+                                                'service_name' => $service_name,
+                                                'total_amount' => $including_check_total,
+                                                'offering_type_id' => $detail['offering_type_id']
+                                            );
+                                            ?>
+                                    </strong></span></span></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -399,7 +428,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
 
 
     <div class="mt-5 service-header" style="font-size: 25px; background-color: gainsboro;">
-        Final Denomination Summary for <?php echo $service_date; ?>
+        Denomination Summary for <?php echo $service_date; ?>
     </div>
     <div class="row">
         <div class="col-md-4">
@@ -419,11 +448,76 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
         </div>
     </div>
 
+    <div class="mt-5 service-header" style="font-size: 25px; background-color: gainsboro;">
+      Final Service Summary for <?php echo $service_date; ?>
+    </div>
     <div class="row">
-        <div class="col-md-4 offset-md-8">
+        <div class="col-md-4">
             <?php
             echo generateGrandTotalTable($grand_total_check_amount, $grand_total_checks_count, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'include-check');
             ?>
+        </div>
+
+
+        <div class="col-md-4">
+            <table class="table table-bordered ">
+                <thead>
+                    <tr>
+                        <th>Service Name</th>
+                        <th>Total Amount</th>
+                        <!-- <th>Offering Type ID</th> -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($final_summary_services as $service) { ?>
+                        <tr>
+                            <td><?php echo $service['service_name']; ?></td>
+                            <td class="text-end"><?php echo $service['total_amount']; ?></td>
+                            <!-- <td><?php echo $service['offering_type_id']; ?></td> -->
+                        </tr>
+                    <?php } ?>
+                    <!-- <tr>
+                        <th><b>Final Tithe Total </b><?php //echo $grand_total_tithe_amount; 
+                                                        ?></th>
+                        <th><?php //echo $grand_total_tithe_amount; 
+                            ?></b></th>
+                    </tr>
+                    <tr>
+                        <th><b>Final Thanks Total </b></th>
+                        <th><?php //echo $grand_total_thanks_amount; 
+                            ?></b></th>
+                    </tr> -->
+                    <?php
+                    $grouped_services = [];
+                    foreach ($final_summary_services as $service) {
+                        $offering_type_id = $service['offering_type_id'];
+                        if ($offering_type_id == 1 || $offering_type_id == 3) {
+                            if (!isset($grouped_services[$offering_type_id])) {
+                                $grouped_services[$offering_type_id] = array(
+                                    'total_amount' => 0,
+                                    'services' => []
+                                );
+                            }
+                            $grouped_services[$offering_type_id]['total_amount'] += $service['total_amount'];
+                            $grouped_services[$offering_type_id]['services'][] = $service['service_name'];
+                        }
+                    }
+                    ?>
+                    <?php foreach ($grouped_services as $offering_type_id => $data) { ?>
+                        <tr>
+                            <th><?php if ($offering_type_id == 1) {
+                                    echo "Grand Total Tithe";
+                                } elseif ($offering_type_id == 3) {
+                                    echo "Grand Total Thanksgiving";
+                                }; ?>
+                            </th>
+                            <!-- <th><?php //echo implode('<br>', $data['services']); 
+                                        ?></th> -->
+                            <th class="text-end"><?php echo $data['total_amount']; ?></th>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
         </div>
     </div>
 
