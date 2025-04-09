@@ -704,7 +704,8 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             smoothScrollAndHandleScroll('#offerings-container', 500);
         } //add row
 
-        $(document).on('click', '.edit-offering', function() {
+        $(document).on('click', '.edit-offering', function(e) {
+            e.stopPropagation();
             console.log('edit-offering');
             const row = $(this).closest('tr'); // Get the clicked row
             row.find('input, select').attr('readonly', false).prop('disabled', false);
@@ -712,7 +713,8 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             row.find('.update-offering').show();
         });
 
-        $(document).on('click', '.update-offering', function() {
+        $(document).on('click', '.update-offering', function(e) {
+            e.stopPropagation();
             console.log('update-offering');
             const row = $(this).closest('tr'); // Get the clicked row
             row.find('input, select').attr('readonly', true).prop('disabled', true);
@@ -786,7 +788,12 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
 
         });
 
-        $(document).on('click', '.add-offering', function() {
+        // $(document).on('click', '.align-items-center', function() {
+        //     alert('clicked event propogation ');
+        // });
+
+        $(document).on('click', '.add-offering', function(e) {
+            e.stopPropagation();
             console.log('add-offering');
             const row = $(this).closest('tr'); // Get the clicked row
             const data = {}; // Initialize data object to store values
