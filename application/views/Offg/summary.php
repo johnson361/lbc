@@ -469,7 +469,11 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($final_summary_services as $service) { ?>
+                    <?php 
+					if(empty($final_summary_services)) {
+						$final_summary_services = [];
+					}
+					foreach ($final_summary_services as $service) { ?>
                         <tr>
                             <td><?php echo $service['service_name']; ?></td>
                             <td class="text-end"><?php echo $service['total_amount']; ?></td>

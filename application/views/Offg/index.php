@@ -30,14 +30,23 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                 <input type="date" id="service_date" name="service_date" class="form-control" placeholder="dd/mm/yyyy">
             </label>
 
-            <select name="service_id" id="service_id" class="form-select" style=" width: 400; ">
-                <option value="">--Please Select Service-- </option>
-                <?php foreach ($services as $service): ?>
-                    <option value="<?= $service['id'] ?>" <?= $service_id == $service['id'] ? 'selected' : '' ?>>
-                        <?= $service['language_name'] ?> - <?= $service['offering_name'] ?> - <?= $service['service_slot'] ?>
-                    </option>
-                <?php endforeach; ?>
-            </select>
+            <select name="service_id" id="service_id" class="form-select" style="width: 400px;">
+				<option value="">--Please Select Service--</option>
+				<?php foreach ($services as $service): ?>
+					<?php
+						$service_details = [];
+						if (!empty($service['language_name'])) $service_details[] = $service['language_name'];
+						if (!empty($service['offering_name'])) $service_details[] = $service['offering_name'];
+						if (!empty($service['service_slot'])) $service_details[] = $service['service_slot'];
+
+						$service_string = implode(' - ', $service_details);
+					?>
+					<option value="<?= $service['id'] ?>" <?= ($service_id == $service['id']) ? 'selected' : '' ?>>
+						<?= $service_string ?>
+					</option>
+				<?php endforeach; ?>
+			</select>
+
         </div>
 
         <table class="table table-bordered offerings_table <?= $tableClass ?>">
@@ -250,7 +259,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             }
         });
 
-        smoothScrollAndHandleScroll('#offerings-container', 500);
+        //smoothScrollAndHandleScroll('#offerings-container', 500);
 
         <?php if (empty($tableClass)) { ?>
             $('#service_date').prop('disabled', true);
@@ -529,12 +538,6 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             }
         });
 
-        // function handleInputEvent(inputElement) {
-        //     const row = $(inputElement).closest('tr');
-        //     calculateTotal(row);
-        //     updateCurrencyTable();
-        // }
-
         function handleInputEvent(inputElement) {
             let row;
             if (inputElement) {
@@ -565,93 +568,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             }
         });
 
-
-        // $('#service_id').on('change', function() {
-        //     // Simulate read-only behavior by preventing any further interaction
-        //     $('#service_date').prop('disabled', true);
-
-        //     $(this).css({
-        //         'pointer-events': 'none', // Disable interaction (simulates read-only)
-        //         'background-color': '#f0f0f0', // Optional: Change background color to simulate read-only state
-        //         'color': '#666' // Optional: Change the text color to simulate read-only state
-        //     });
-        //     // fetchExistingData();
-        // });
-
-        // function fetchExistingData() {
-        //     // Get selected service_id and service_date values
-        //     const serviceId = $('#service_id').val();
-        //     const serviceDate = $('#service_date').val();
-
-        //     if (!serviceId || !serviceDate) {
-        //         PNotify.error({
-        //             title: 'Error!',
-        //             text: 'Please select both Service and Date!',
-        //             delay: 2000
-        //         });
-        //         return;
-        //     }
-
-        //     // Perform the AJAX call
-        //     $.ajax({
-        //         url: '<?= site_url("offerings/fetchExistingData"); ?>', // Replace with the correct URL for your backend endpoint
-        //         method: 'POST', // Use the appropriate HTTP method (GET/POST) based on your backend implementation
-        //         data: {
-        //             service_id: serviceId,
-        //             service_date: serviceDate
-        //         },
-        //         dataType: 'json',
-        //         success: function(response) {
-        //             // Parse the response if necessary
-        //             const data = typeof response === 'string' ? JSON.parse(response) : response;
-
-        //             if (data.success) {
-        //                 //$('.original_tr').hide(); //remove original row 
-
-        //                 // Iterate over the response data and populate the table
-        //                 data.data.forEach((item, index) => {
-
-        //                     // Clone the existing row
-        //                     const newRow = $('#offerings-container tr:first').clone();
-        //                     //newRow.removeClass('original_tr');
-
-        //                     // Populate the row with response data
-        //                     newRow.find('.row-number').text(index + 1);
-        //                     newRow.find('.serial_no').val(item.serial_no);
-        //                     newRow.find('.autocomplete_member').val(item.full_name);
-        //                     newRow.find('[name*="denomination_2000"]').val(item.denomination_2000);
-        //                     newRow.find('[name*="denomination_500"]').val(item.denomination_500);
-        //                     newRow.find('[name*="denomination_200"]').val(item.denomination_200);
-        //                     newRow.find('[name*="denomination_100"]').val(item.denomination_100);
-        //                     newRow.find('[name*="denomination_50"]').val(item.denomination_50);
-        //                     newRow.find('[name*="denomination_20_notes"]').val(item.denomination_20_notes);
-        //                     newRow.find('[name*="denomination_20_coins"]').val(item.denomination_20_coins);
-        //                     newRow.find('[name*="denomination_10_notes"]').val(item.denomination_10_notes);
-        //                     newRow.find('[name*="denomination_10_coins"]').val(item.denomination_10_coins);
-        //                     newRow.find('[name*="denomination_5_notes"]').val(item.denomination_5_notes);
-        //                     newRow.find('[name*="denomination_5_coins"]').val(item.denomination_5_coins);
-        //                     newRow.find('[name*="denomination_2_notes"]').val(item.denomination_2_notes);
-        //                     newRow.find('[name*="denomination_2_coins"]').val(item.denomination_2_coins);
-        //                     newRow.find('[name*="denomination_1_notes"]').val(item.denomination_1_notes);
-        //                     newRow.find('[name*="denomination_1_coins"]').val(item.denomination_1_coins);
-        //                     newRow.find('.total-amount').text(item.total_amount);
-
-        //                     // Append the populated row to the table body
-        //                     $('#offerings-container').append(newRow);
-        //                 });
-        //             } 
-        //             // else {
-        //             //     alert(data.message || 'No data found.');
-        //             // }
-        //         },
-        //         error: function(xhr, status, error) {
-        //             console.error('AJAX Error:', error);
-        //             alert('An error occurred while fetching data.');
-        //         }
-        //     });
-        // }
-
-        function smoothScrollAndHandleScroll(containerSelector, duration) {
+        /*function smoothScrollAndHandleScroll(containerSelector, duration) {
             $('html, body').animate({
                 scrollTop: $(containerSelector).offset().top + $(containerSelector).height()
             }, duration);
@@ -669,7 +586,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                     // add custom logic for scrolling up
                 }
             });
-        }
+        }*/
 
         function addNewRow() {
             console.log('addNewRow');;
@@ -701,7 +618,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             $('#offerings-container').append(newRow);
             rowCount++; // Increment the rowCount
 
-            smoothScrollAndHandleScroll('#offerings-container', 500);
+            //smoothScrollAndHandleScroll('#offerings-container', 500);
         } //add row
 
         $(document).on('click', '.edit-offering', function(e) {
