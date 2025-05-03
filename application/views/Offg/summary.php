@@ -115,6 +115,31 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
         $count_notes_coins_header = 'Notes';
     } else if ($filter === 'include-check') {
         $count_notes_coins_header = 'Notes/Coins/Checks';
+
+        $coins_total  = array_filter($denominations, function ($key) {
+            return strpos($key, 'Coins') !== false;
+        }, ARRAY_FILTER_USE_KEY);
+        
+        $coins_total_amount = 0;
+        foreach ($coins_total as $denomination => $total) {
+            if (!empty($total)) {
+                $denom_value = (int)preg_replace('/\D/', '', $denomination);
+                $amount = $total * $denom_value;
+                $coins_total_amount += $amount;
+            }
+        }
+
+        $notes_total = array_filter($denominations, function ($key) {
+            return strpos($key, 'Coins') === false;
+        }, ARRAY_FILTER_USE_KEY);
+        $notes_total_amount = 0;
+        foreach ($notes_total as $denomination => $total) {
+            if (!empty($total)) {
+                $denom_value = (int)preg_replace('/\D/', '', $denomination);
+                $amount = $total * $denom_value;
+                $notes_total_amount += $amount;
+            }
+        }
     }
 
     $table = '<table class="table table-bordered table-striped table-hover text-end" >
@@ -140,6 +165,22 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                         </tr>";
             $grand_total_amount += $amount;
         }
+    }
+
+    if (!empty($coins_total_amount)) {
+        $table .= "<tr>
+                        <td ><strong>Coins Totals</strong></td>
+                        <td></td>                        
+                        <td colspan='2'><strong>{$coins_total_amount}</strong></td>
+                    </tr>";
+    }
+
+    if (!empty($notes_total_amount)) {
+        $table .= "<tr>
+                        <td ><strong>Notes Totals</strong></td>
+                        <td></td>                        
+                        <td colspan='2'><strong>{$notes_total_amount}</strong></td>
+                    </tr>";
     }
 
     $include_check_total = '';
@@ -465,6 +506,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                         <th>Sno</th>
                         <th style="width: 60%;">Service Name</th>
                         <th>Total Amount</th>
+                        <!-- <th>Offering Type ID</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -511,10 +553,10 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                     <?php foreach ($grouped_services as $offering_type_id => $data) { ?>
                         <tr>
                             <th colspan=2><?php if ($offering_type_id == 1) {
-                                    echo "Combined Tithe";
-                                } elseif ($offering_type_id == 3) {
-                                    echo "Combined Thanksgiving";
-                                }; ?>
+                                                echo "Combined Tithe";
+                                            } elseif ($offering_type_id == 3) {
+                                                echo "Combined Thanksgiving";
+                                            }; ?>
                             </th>
                             <!-- <th><?php //echo implode('<br>', $data['services']); 
                                         ?></th> -->
