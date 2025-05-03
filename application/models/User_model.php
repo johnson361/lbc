@@ -36,6 +36,7 @@ class User_model extends CI_Model
     {
         $this->db->select("id, CONCAT(IFNULL(name, ''), '-', IFNULL(phone, '')) AS name");
         $this->db->like('name', $query);
+		$this->db->or_like('phone', $query);
         $query = $this->db->get('users');
 
         //log_message('info', 'Last query executed: ' . $this->db->last_query());

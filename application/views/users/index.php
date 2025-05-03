@@ -1,7 +1,10 @@
+
+<link rel="stylesheet" href="<?php echo base_url('assets/css/jquery.dataTables.min.css'); ?>">
+
 <div class="container mt-5">
     <h2>Member List</h2>
     <a href="<?= site_url('users/create'); ?>" class="btn btn-primary mb-3">Add New Member</a>
-    <table class="table table-bordered">
+    <table class="table table-bordered table-striped" id="datatable">
         <thead>
             <tr>
                 <th>ID</th>
@@ -27,3 +30,14 @@
         </tbody>
     </table>
 </div>
+
+<script src="<?php echo base_url('assets/js/jquery.dataTables.min.js'); ?>"></script>
+
+jquery.dataTables.min.js
+<script>
+	$(document).ready( function () {
+		$('#datatable').DataTable({
+			pageLength: 500
+		});
+	} );
+</script>
