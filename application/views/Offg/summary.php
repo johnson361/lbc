@@ -462,9 +462,9 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
             <table class="table table-bordered ">
                 <thead>
                     <tr>
-                        <th>Service Name</th>
+                        <th>Sno</th>
+                        <th style="width: 60%;">Service Name</th>
                         <th>Total Amount</th>
-                        <!-- <th>Offering Type ID</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -472,8 +472,10 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                     if (empty($final_summary_services)) {
                         $final_summary_services = [];
                     }
+                    $i = 1;
                     foreach ($final_summary_services as $service) { ?>
                         <tr>
+                            <td><?php echo $i++; ?></td>
                             <td><?php echo $service['service_name']; ?></td>
                             <td class="text-end"><?php echo $service['total_amount']; ?></td>
                             <!-- <td><?php echo $service['offering_type_id']; ?></td> -->
@@ -508,7 +510,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                     ?>
                     <?php foreach ($grouped_services as $offering_type_id => $data) { ?>
                         <tr>
-                            <th><?php if ($offering_type_id == 1) {
+                            <th colspan=2><?php if ($offering_type_id == 1) {
                                     echo "Combined Tithe";
                                 } elseif ($offering_type_id == 3) {
                                     echo "Combined Thanksgiving";
