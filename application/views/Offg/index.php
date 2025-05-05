@@ -21,7 +21,7 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                     <input type="checkbox" id="short_notes_toggle" class="toggle_checkbox"> Show Rare Notes
                 </label>
                 <label class="me-5">
-                    <input type="checkbox" id="check_toggle" class="toggle_checkbox"> Show Check
+                    <input type="checkbox" id="check_toggle" class="toggle_checkbox"> Show Cheque
                 </label>
             </span>
 
@@ -69,8 +69,8 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                     <th class="short_coins">2 C</th>
                     <th class="short_notes">1 N</th>
                     <th class="short_coins">1 C</th>
-                    <th class="check_column">Check No</th>
-                    <th class="check_column">Check Amount</th>
+                    <th class="check_column">Cheque No</th>
+                    <th class="check_column">Cheque Amount</th>
 
                     <th>Total</th>
                     <th>Add</th>
@@ -516,7 +516,7 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
             tableHtml += `<tr><td colspan="2"><strong>Total Cash Amount</strong></td><td><strong>₹${grandTotal}</strong></td></tr>`;
 
             total_check_amount = $('#total-check-amount').html();
-            tableHtml += `<tr><td colspan="2"><strong>Check Amount</strong></td><td><strong>₹${total_check_amount}</strong></td></tr>`;
+            tableHtml += `<tr><td colspan="2"><strong>Cheque Amount</strong></td><td><strong>₹${total_check_amount}</strong></td></tr>`;
 
             grandTotal = parseFloat(grandTotal) || 0; // Default to 0 if undefined or not a number
             total_check_amount = parseFloat(total_check_amount) || 0;

@@ -33,7 +33,6 @@
 
 <script src="<?php echo base_url('assets/js/jquery.dataTables.min.js'); ?>"></script>
 
-jquery.dataTables.min.js
 <script>
 	$(document).ready( function () {
 		$('#datatable').DataTable({

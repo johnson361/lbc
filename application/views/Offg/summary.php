@@ -64,7 +64,7 @@ function generateDenominationTable($total_check_amount = 0, $total_checks_count 
 
     if ($filter == 'include-check') {
         $table .= "<tr>
-                        <td ><strong>Check Totals</strong></td>
+                        <td ><strong>Cheque Totals</strong></td>
                         <td><strong>{$total_checks_count}</strong></td>                        
                         <td colspan='2' class='" . ($total_check_amount > 0 ? 'is-check' : '') . "'><strong>{$total_check_amount}</strong></td>
                     </tr>";
@@ -114,12 +114,12 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
         }, ARRAY_FILTER_USE_KEY);
         $count_notes_coins_header = 'Notes';
     } else if ($filter === 'include-check') {
-        $count_notes_coins_header = 'Notes/Coins/Checks';
+        $count_notes_coins_header = 'Notes/Coins/Cheques';
 
         $coins_total  = array_filter($denominations, function ($key) {
             return strpos($key, 'Coins') !== false;
         }, ARRAY_FILTER_USE_KEY);
-        
+
         $coins_total_amount = 0;
         foreach ($coins_total as $denomination => $total) {
             if (!empty($total)) {
@@ -185,14 +185,14 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
 
     $include_check_total = '';
     if ($filter == 'include-check') {
-        $include_check_total = 'With Checks';;
+        $include_check_total = 'With Cheques';;
         $table .= "<tr>
-                        <td ><strong>Check Totals</strong></td>
+                        <td ><strong>Cheque Totals</strong></td>
                         <td><strong>{$grand_total_checks_count}</strong></td>                        
                         <td colspan='2'><strong>{$grand_total_check_amount}</strong></td>
                     </tr>";
         $table .= "<tr>
-                    <td ><strong>Without Checks Total</strong></td>                       
+                    <td ><strong>Without Cheques Total</strong></td>                       
                     <td colspan='2'><strong>{$grand_total_amount}</strong></td>
                 </tr>";
         $grand_total_amount += $grand_total_check_amount;
@@ -296,7 +296,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                             <th class="text-end">2 C</th>
                             <th class="text-end very-rare-notes">1 N</th>
                             <th class="text-end">1 C</th>
-                            <th class="text-end">CHK</th>
+                            <th class="text-end">CHQ</th>
                             <th class="text-end">Total Amount</th>
                         </tr>
                     </thead>
@@ -432,7 +432,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                             <td class="text-end"><span class="<?= $total_1_coins == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_1_coins) ?></strong></span></td>
                             <td class="text-end <?= $total_check_amount > 0 ? 'is-check' : '' ?>"><span class="<?= $total_check_amount == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_check_amount) ?></strong></span></td>
                             <td class="text-end">CASH<span class="<?= $total_amount == 0 ? 'd-none' : '' ?>"><strong>
-                                        <?= htmlspecialchars($total_amount) ?> <br><span class="<?= $total_check_amount > 0 ? 'is-check' : '' ?>"> Including CHK :
+                                        <?= htmlspecialchars($total_amount) ?> <br><span class="<?= $total_check_amount > 0 ? 'is-check' : '' ?>"> Including CHQ :
                                             <?php $including_check_total =  htmlspecialchars($total_check_amount + $total_amount);
                                             echo $including_check_total;
 
@@ -523,17 +523,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                             <!-- <td><?php echo $service['offering_type_id']; ?></td> -->
                         </tr>
                     <?php } ?>
-                    <!-- <tr>
-                        <th><b>Final Tithe Total </b><?php //echo $grand_total_tithe_amount; 
-                                                        ?></th>
-                        <th><?php //echo $grand_total_tithe_amount; 
-                            ?></b></th>
-                    </tr>
-                    <tr>
-                        <th><b>Final Thanks Total </b></th>
-                        <th><?php //echo $grand_total_thanks_amount; 
-                            ?></b></th>
-                    </tr> -->
+
                     <?php
                     $grouped_services = [];
                     foreach ($final_summary_services as $service) {
@@ -572,6 +562,22 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
             echo generateGrandTotalTable($grand_total_check_amount, $grand_total_checks_count, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'include-check');
             ?>
         </div>
+        <!-- <div class="col-md-4">
+            <table class="table table-bordered ">
+                <thead>
+                    <tr>
+                        <th>Sno</th>
+                        <th>Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>2</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div> -->
     </div>
 
 </div>
