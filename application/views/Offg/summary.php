@@ -628,23 +628,36 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                 </thead>
                 <tbody>
                     <?php echo generateOfferingRows($grouped_services); ?>
-                    <tr>
-                        <td>Coins</td>
-                        <td colspan="2" class="text-end"><?php echo $grouped_coins; ?></td>
-                    </tr>
+                    <?php if ($grouped_coins < 0) { ?>
+                        <tr>
+                            <td>Coins</td>
+                            <td colspan="2" class="text-end"><?php echo $grouped_coins; ?></td>
+                        </tr>
+                    <?php } ?>
+
                     <tr>
                         <td>Notes</td>
                         <td colspan="2" class="text-end"><?php echo $grouped_notes; ?></td>
                     </tr>
+
                     <tr>
                         <td>Notes + Coins</td>
                         <td colspan="2" class="text-end"><?php echo $grouped_without_cheque; ?></td>
                     </tr>
-                    <tr>
-                        <td>Cheque</td>
-                        <td class="text-end"> <?php echo $grouped_cheque_count ?></td>
-                        <td class="text-end"><?php echo $grouped_only_cheque; ?></td>
-                    </tr>
+
+                    <?php if ($grouped_without_cheque > 0) { ?>
+                        <tr>
+                            <td>Without Cheques Grand Total</td>
+                            <td colspan="2" class="text-end"><?php echo $grouped_without_cheque; ?></td>
+                        </tr>
+                    <?php } ?>
+                    <?php if ($grouped_only_cheque > 0) { ?>
+                        <tr>
+                            <td>Cheque</td>
+                            <td class="text-end"> <?php echo $grouped_cheque_count ?></td>
+                            <td class="text-end"><?php echo $grouped_only_cheque; ?></td>
+                        </tr>
+                    <?php } ?>
 
                     <tr>
                         <td>With Cheques Grand Total</td>
