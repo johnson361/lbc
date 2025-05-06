@@ -1,4 +1,38 @@
 <?php
+global $grouped_data;
+global $grouped_coins;
+global $grouped_notes;
+global $grouped_only_cheque;
+global $grouped_cheque_count;
+global $grouped_without_cheque;
+global $grouped_grand_total;
+$grouped_data = '';
+function generateOfferingRows($grouped_services)
+{
+    global $grouped_data;
+
+    $grouped_data = ''; // Reset inside function too
+
+    $titles = [
+        1 => "Combined Tithe",
+        3 => "Combined Thanksgiving"
+    ];
+
+    foreach ($grouped_services as $offering_type_id => $data) {
+        $offering_title = $titles[$offering_type_id] ?? '';
+        $total_amount = $data['total_amount'];
+
+        $grouped_data .= '
+            <tr>
+                <td >' . $offering_title . '</td>
+                 <td ></td>
+                <td class="text-end">' . $total_amount . '</td>
+            </tr>
+        ';
+    }
+    return $grouped_data;
+}
+
 function generateDenominationTable($total_check_amount = 0, $total_checks_count = 0, $total_2000 = 0, $total_500 = 0, $total_200 = 0, $total_100 = 0, $total_50 = 0, $total_20_notes = 0, $total_20_coins = 0, $total_10_notes = 0, $total_10_coins = 0, $total_5_notes = 0, $total_5_coins = 0, $total_2_notes = 0, $total_2_coins = 0, $total_1_notes = 0, $total_1_coins = 0, $filter = null)
 {
     // Array of denominations and their corresponding values
@@ -9,14 +43,15 @@ function generateDenominationTable($total_check_amount = 0, $total_checks_count 
         '₹100' => ['total' => $total_100],
         '₹50' => ['total' => $total_50],
         '₹20 Notes' => ['total' => $total_20_notes],
-        '₹20 Coins' => ['total' => $total_20_coins],
         '₹10 Notes' => ['total' => $total_10_notes],
-        '₹10 Coins' => ['total' => $total_10_coins],
         '₹5 Notes' => ['total' => $total_5_notes],
-        '₹5 Coins' => ['total' => $total_5_coins],
         '₹2 Notes' => ['total' => $total_2_notes],
-        '₹2 Coins' => ['total' => $total_2_coins],
         '₹1 Notes' => ['total' => $total_1_notes],
+
+        '₹20 Coins' => ['total' => $total_20_coins],
+        '₹10 Coins' => ['total' => $total_10_coins],
+        '₹5 Coins' => ['total' => $total_5_coins],
+        '₹2 Coins' => ['total' => $total_2_coins],
         '₹1 Coins' => ['total' => $total_1_coins],
     ];
 
@@ -39,7 +74,7 @@ function generateDenominationTable($total_check_amount = 0, $total_checks_count 
                 <thead>
                     <tr>
                         <th style=" width: 33%; ">Denomination</th>
-                        <th style=" width: 33%; ">Count of ' . $count_notes_coins_header . '</th>
+                        <th style=" width: 33%; ">Count of. ' . $count_notes_coins_header . '</th>
                         <th style=" width: 33%; ">Amount</th>
                     </tr>
                 </thead>
@@ -55,13 +90,12 @@ function generateDenominationTable($total_check_amount = 0, $total_checks_count 
 
         $table .= "<tr>
                         <td>{$denomination}</td>
-                        <td><strong>{$data['total']}</strong></td>
-                        <td><strong>" . htmlspecialchars($amount) . "</strong></td>
+                        <td>{$data['total']}</td>
+                        <td>" . htmlspecialchars($amount) . "</td>
                     </tr>";
 
         $grandTotal += $amount;
     }
-
     if ($filter == 'include-check') {
         $table .= "<tr>
                         <td ><strong>Cheque Totals</strong></td>
@@ -82,8 +116,10 @@ function generateDenominationTable($total_check_amount = 0, $total_checks_count 
     return $table;
 }
 
+
 function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_checks_count = 0, $grand_total_2000 = 0, $grand_total_500 = 0, $grand_total_200 = 0, $grand_total_100 = 0, $grand_total_50 = 0, $grand_total_20_notes = 0, $grand_total_20_coins = 0, $grand_total_10_notes = 0, $grand_total_10_coins = 0, $grand_total_5_notes = 0, $grand_total_5_coins = 0, $grand_total_2_notes = 0, $grand_total_2_coins = 0, $grand_total_1_notes = 0, $grand_total_1_coins = 0, $grand_total_amount = 0, $filter = null)
 {
+
     $denominations = [
         '₹2000' => $grand_total_2000,
         '₹500' => $grand_total_500,
@@ -91,14 +127,15 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
         '₹100' => $grand_total_100,
         '₹50' => $grand_total_50,
         '₹20 Notes' => $grand_total_20_notes,
-        '₹20 Coins' => $grand_total_20_coins,
         '₹10 Notes' => $grand_total_10_notes,
-        '₹10 Coins' => $grand_total_10_coins,
         '₹5 Notes' => $grand_total_5_notes,
-        '₹5 Coins' => $grand_total_5_coins,
         '₹2 Notes' => $grand_total_2_notes,
-        '₹2 Coins' => $grand_total_2_coins,
         '₹1 Notes' => $grand_total_1_notes,
+
+        '₹20 Coins' => $grand_total_20_coins,
+        '₹10 Coins' => $grand_total_10_coins,
+        '₹5 Coins' => $grand_total_5_coins,
+        '₹2 Coins' => $grand_total_2_coins,
         '₹1 Coins' => $grand_total_1_coins,
     ];
 
@@ -146,7 +183,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                 <thead>
                     <tr>
                         <th style=" width: 33%; ">Denomination</th>
-                        <th style=" width: 33%; ">Count of ' . $count_notes_coins_header . '</th>
+                        <th style=" width: 33%; " title="Count of- ' . $count_notes_coins_header . '">Count</th>
                         <th style=" width: 33%; ">Amount</th>
                     </tr>
                 </thead>
@@ -160,15 +197,18 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
 
             $table .= "<tr>
                             <td>{$denomination}</td>
-                            <td><strong>{$total}</strong></td>
-                            <td><strong>{$amount}</strong></td>
+                            <td>{$total}</td>
+                            <td>{$amount}</td>
                         </tr>";
             $grand_total_amount += $amount;
         }
     }
 
+    $table_del = '';
     if (!empty($coins_total_amount)) {
-        $table .= "<tr>
+        global $grouped_coins;
+        $grouped_coins = $coins_total_amount;
+        $table_del .= "<tr>
                         <td ><strong>Coins Totals</strong></td>
                         <td></td>                        
                         <td colspan='2'><strong>{$coins_total_amount}</strong></td>
@@ -176,7 +216,9 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
     }
 
     if (!empty($notes_total_amount)) {
-        $table .= "<tr>
+        global $grouped_notes;
+        $grouped_notes = $notes_total_amount;
+        $table_del .= "<tr>
                         <td ><strong>Notes Totals</strong></td>
                         <td></td>                        
                         <td colspan='2'><strong>{$notes_total_amount}</strong></td>
@@ -185,13 +227,19 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
 
     $include_check_total = '';
     if ($filter == 'include-check') {
-        $include_check_total = 'With Cheques';;
-        $table .= "<tr>
+        $include_check_total = 'With Cheques';
+        global $grouped_only_cheque;
+        global $grouped_without_cheque;
+        global $grouped_cheque_count;
+        $grouped_cheque_count = $grand_total_checks_count;
+        $grouped_only_cheque = $grand_total_check_amount;
+        $grouped_without_cheque = $grand_total_amount;
+        $table_del .= "<tr>
                         <td ><strong>Cheque Totals</strong></td>
                         <td><strong>{$grand_total_checks_count}</strong></td>                        
                         <td colspan='2'><strong>{$grand_total_check_amount}</strong></td>
                     </tr>";
-        $table .= "<tr>
+        $table_del .= "<tr>
                     <td ><strong>Without Cheques Total</strong></td>                       
                     <td colspan='2'><strong>{$grand_total_amount}</strong></td>
                 </tr>";
@@ -199,7 +247,9 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
     }
 
     if (!empty($grand_total_amount)) {
-        $table .= "<tr>
+        global $grouped_grand_total;
+        $grouped_grand_total = $grand_total_amount;
+        $table_del .= "<tr>
                         <td><strong>$include_check_total Grand Total</strong></td>
                         <td></td>
                         <td><strong>{$grand_total_amount}</strong></td>
@@ -207,10 +257,11 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
     }
 
     $table .= '</tbody></table>';
-
     return $table;
 }
 ?>
+
+<div class="page-break"></div>
 
 <div class="container-fluid">
     <h3 style="text-align:center">Offerings Summary for <?php echo $service_date = (new DateTime($service_date))->format('d-m-Y') ?></h3>
@@ -495,12 +546,13 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
         </div>
     </div>
 
+    <div class="page-break"></div>
     <div class="mt-5 service-header" style="font-size: 25px; background-color: gainsboro;">
         Final Service Summary for <?php echo $service_date; ?>
     </div>
     <div class="row">
         <div class="col-md-4">
-            <table class="table table-bordered ">
+            <table class="table table-bordered  table-striped table-hover">
                 <thead>
                     <tr>
                         <th>Sno</th>
@@ -539,8 +591,11 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                             $grouped_services[$offering_type_id]['services'][] = $service['service_name'];
                         }
                     }
+
+
+                    //echo generateOfferingRows($grouped_services);
                     ?>
-                    <?php foreach ($grouped_services as $offering_type_id => $data) { ?>
+                    <?php /* foreach ($grouped_services as $offering_type_id => $data) { ?>
                         <tr>
                             <th colspan=2><?php if ($offering_type_id == 1) {
                                                 echo "Combined Tithe";
@@ -552,7 +607,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                                         ?></th> -->
                             <th class="text-end"><?php echo $data['total_amount']; ?></th>
                         </tr>
-                    <?php } ?>
+                    <?php } */ ?>
                 </tbody>
             </table>
         </div>
@@ -562,22 +617,43 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
             echo generateGrandTotalTable($grand_total_check_amount, $grand_total_checks_count, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'include-check');
             ?>
         </div>
-        <!-- <div class="col-md-4">
-            <table class="table table-bordered ">
+        <div class="col-md-4">
+            <table class="table table-bordered  table-striped table-hover">
                 <thead>
                     <tr>
-                        <th>Sno</th>
-                        <th>Total Amount</th>
+                        <th>Name</th>
+                        <th>Count</th>
+                        <th>Total</th>
                     </tr>
                 </thead>
                 <tbody>
+                    <?php echo generateOfferingRows($grouped_services); ?>
                     <tr>
-                        <td>1</td>
-                        <td>2</td>
+                        <td>Coins</td>
+                        <td colspan="2" class="text-end"><?php echo $grouped_coins; ?></td>
+                    </tr>
+                    <tr>
+                        <td>Notes</td>
+                        <td colspan="2" class="text-end"><?php echo $grouped_notes; ?></td>
+                    </tr>
+                    <tr>
+                        <td>Notes + Coins</td>
+                        <td colspan="2" class="text-end"><?php echo $grouped_without_cheque; ?></td>
+                    </tr>
+                    <tr>
+                        <td>Cheque</td>
+                        <td class="text-end"> <?php echo $grouped_cheque_count ?></td>
+                        <td class="text-end"><?php echo $grouped_only_cheque; ?></td>
+                    </tr>
+
+                    <tr>
+                        <td>With Cheques Grand Total</td>
+                        <td colspan="2" class="text-end"><?php echo $grouped_grand_total; ?></td>
                     </tr>
                 </tbody>
             </table>
-        </div> -->
+
+        </div>
     </div>
 
 </div>
@@ -590,8 +666,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
 
     table th:nth-child(2),
     table td:nth-child(2) {
-        width: 200px;
-        /* Set the desired fixed width */
+        /*width: 200px;  */
         word-wrap: break-word;
     }
 

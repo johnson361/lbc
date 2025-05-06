@@ -1,12 +1,9 @@
 /* Style for the Member column */
 .offerings_table td:nth-child(2),
 .offerings_table th:nth-child(2) {
-    width: 200px;
-    /* Adjust the width to fit the full name */
-    text-align: left;
-    /* Align text to the left */
-    padding-left: 10px;
-    /* Add some padding to the left */
+    width: 200px; /* Adjust the width to fit the full name */
+    text-align: left; /* Align text to the left */
+    padding-left: 10px;  /* Add some padding to the left */
 }
 
 /* Optional: Style the dropdown in the Member column */
@@ -100,17 +97,20 @@
 
 .offerings_table thead th.short_coins,
 .offerings_table tbody td.short_coins {
-    background-color: #E0F2F1;  /*light green*/
+    background-color: #E0F2F1;
+    /*light green*/
 }
 
 .offerings_table thead th.short_notes,
 .offerings_table tbody td.short_notes {
-    background-color: #E3F2FD; /*light blue*/
+    background-color: #E3F2FD;
+    /*light blue*/
 }
 
 .offerings_table tbody th.check_column,
 .offerings_table tbody td.check_column {
-    background-color: #FFFDE7; /*light Yellow*/
+    background-color: #FFFDE7;
+    /*light Yellow*/
 }
 
 .short_coins,
@@ -140,6 +140,11 @@
 
 .is-check {
     background-color: #34a88a !important;
+}
+
+.row>* {
+    padding-right: 10px;
+    padding-left: 10px;
 }
 
 @media print {
