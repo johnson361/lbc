@@ -28,6 +28,7 @@ class Users extends CI_Controller
                 'name'  => $this->input->post('name') ?? NULL,
                 'email' => $this->input->post('email') ??  NULL,
                 'phone' => $this->input->post('phone') ?? NULL,
+                'phone2' => $this->input->post('phone2') ?? NULL,
             );
             // Insert user into database
             $this->User_model->create_user($data);
@@ -47,6 +48,7 @@ class Users extends CI_Controller
                 'name'  => $this->input->post('name') ?? NULL,
                 'email' => $this->input->post('email') ??  NULL,
                 'phone' => $this->input->post('phone') ?? NULL,
+                'phone2' => $this->input->post('phone2') ?? NULL,
             );
 
             // Update user data

@@ -13,6 +13,11 @@
             <label for="phone" class="form-label">Phone Number</label>
             <input type="tel" class="form-control" name="phone" id="phone" maxlength="10" pattern="\d{10}" title="Please enter exactly 10 digits" required>
         </div>
+
+        <div class="mb-3">
+            <label for="phone" class="form-label">Alternate Number </label>
+            <input type="tel" class="form-control" name="phone2" id="phone2" maxlength="10" pattern="\d{10}" title="Please enter exactly 10 digits" required>
+        </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
