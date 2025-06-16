@@ -249,7 +249,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
     if (!empty($grand_total_amount)) {
         global $grouped_grand_total;
         $grouped_grand_total = $grand_total_amount;
-        $table_del .= "<tr>
+        $table .= "<tr>
                         <td><strong>$include_check_total Grand Total</strong></td>
                         <td></td>
                         <td><strong>{$grand_total_amount}</strong></td>
@@ -628,7 +628,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                 </thead>
                 <tbody>
                     <?php echo generateOfferingRows($grouped_services); ?>
-                    <?php if ($grouped_coins < 0) { ?>
+                    <?php if ($grouped_coins > 0) { ?>
                         <tr>
                             <td>Coins</td>
                             <td colspan="2" class="text-end"><?php echo $grouped_coins; ?></td>
