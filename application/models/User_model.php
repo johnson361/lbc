@@ -48,9 +48,20 @@ class User_model extends CI_Model
         $this->db->where('name', $name);
         $query = $this->db->get('users');
 
-        if ($query->num_rows() > 0) {
+        /*if ($query->num_rows() > 0) {
             return $query->row()->id;
-        }
+        }*/
+		
+		if ($query->num_rows() > 0) {
+			$existing_user = $query->row();
+
+			if ($existing_user->phone !== $phone) {
+				$this->db->set('phone', $phone);
+				$this->db->where('name', $name);
+				$this->db->update('users');
+			}
+			return $existing_user->id;
+		}
 
         $data = [
             'name' => $name,

@@ -1,1 +1,22 @@
-select offering_types.offering_name, languages.language_name, `users`.`name` AS `full_name`, users.phone, `lbc`.`offerings`.`id` AS `id`,`lbc`.`offerings`.`service_id` AS `service_id`,`lbc`.`offerings`.`service_date` AS `service_date`, lbc.offerings.total_amount + lbc.offerings.check_amount AS total_amount from ((((`lbc`.`services` join `lbc`.`languages` on((`lbc`.`services`.`language_id` = `lbc`.`languages`.`id`))) join `lbc`.`offering_types` on((`lbc`.`services`.`offering_type_id` = `lbc`.`offering_types`.`id`))) join `lbc`.`offerings` on((`lbc`.`services`.`id` = `lbc`.`offerings`.`service_id`))) join `lbc`.`users` on((`lbc`.`offerings`.`user_id` = `lbc`.`users`.`id`))) where offerings.service_date ="2025-04-27" and phone is not null ORDER BY `languages`.`language_name` ASC;
+SELECT offering_types.offering_name,
+       languages.language_name,
+       `users`.`name`                   AS `full_name`,
+       users.phone,
+       `lbc`.`offerings`.`id`           AS `id`,
+       `lbc`.`offerings`.`service_id`   AS `service_id`,
+       `lbc`.`offerings`.`service_date` AS `service_date`,
+       lbc.offerings.total_amount
+       + lbc.offerings.check_amount     AS total_amount
+FROM   ((((`lbc`.`services`
+           left JOIN `lbc`.`languages`
+             ON(( `lbc`.`services`.`language_id` = `lbc`.`languages`.`id` )))
+          JOIN `lbc`.`offering_types`
+            ON(( `lbc`.`services`.`offering_type_id` =
+                 `lbc`.`offering_types`.`id` )))
+         JOIN `lbc`.`offerings`
+           ON(( `lbc`.`services`.`id` = `lbc`.`offerings`.`service_id` )))
+        JOIN `lbc`.`users`
+          ON(( `lbc`.`offerings`.`user_id` = `lbc`.`users`.`id` )))
+WHERE  offerings.service_date = "2025-04-27"
+       AND phone IS NOT NULL
+ORDER  BY `languages`.`language_name` ASC; 
