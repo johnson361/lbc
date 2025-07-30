@@ -17,6 +17,6 @@ FROM   ((((`lbc`.`services`
            ON(( `lbc`.`services`.`id` = `lbc`.`offerings`.`service_id` )))
         JOIN `lbc`.`users`
           ON(( `lbc`.`offerings`.`user_id` = `lbc`.`users`.`id` )))
-WHERE  offerings.service_date = "2025-04-27"
-       AND phone IS NOT NULL
-ORDER  BY `languages`.`language_name` ASC; 
+WHERE  offerings.service_date = "2025-07-07"
+       AND phone IS NOT NULL and phone != ''
+ORDER  BY `languages`.`language_name` ASC;
