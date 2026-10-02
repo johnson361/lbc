@@ -2,6 +2,23 @@
 $service_id = $this->uri->segment(3);
 $service_date = $this->uri->segment(4);
 
+
+$service_datetime = new DateTime($service_date);
+$three_weeks_ago = new DateTime('today');
+$three_weeks_ago->modify('-3 weeks');
+$user_id = $this->session->userdata('user_id');
+
+if ($service_datetime < $three_weeks_ago && $user_id != 1) {
+
+    echo '
+    <script>
+        $(document).ready(function() {
+            $("button, input[type=\"submit\"], input[type=\"button\"], .btn, .button").hide(); 
+            console.log("Buttons hidden by PHP-injected jQuery.");
+        });
+    </script>';
+}
+
 $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
 
 
@@ -14,6 +31,8 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
             <!-- <label for="service_id" class="form-label mr-2">Select Service</label> -->
 
             <span class="<?= $tableClass ?>">
+                <label class="me-4">
+                    <input type="checkbox" id="show-serial-checkbox" class="toggle_checkbox"> Show Serial </label>
                 <label class="me-4">
                     <input type="checkbox" id="short_coins_toggle" class="toggle_checkbox"> Show Coins.
                 </label>
@@ -31,21 +50,21 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
             </label>
 
             <select name="service_id" id="service_id" class="form-select" style="width: 400px;">
-				<option value="">--Please Select Service--</option>
-				<?php foreach ($services as $service): ?>
-					<?php
-						$service_details = [];
-						if (!empty($service['language_name'])) $service_details[] = $service['language_name'];
-						if (!empty($service['offering_name'])) $service_details[] = $service['offering_name'];
-						if (!empty($service['service_slot'])) $service_details[] = $service['service_slot'];
+                <option value="">--Please Select Service--</option>
+                <?php foreach ($services as $service): ?>
+                    <?php
+                    $service_details = [];
+                    if (!empty($service['language_name'])) $service_details[] = $service['language_name'];
+                    if (!empty($service['offering_name'])) $service_details[] = $service['offering_name'];
+                    if (!empty($service['service_slot'])) $service_details[] = $service['service_slot'];
 
-						$service_string = implode(' - ', $service_details);
-					?>
-					<option value="<?= $service['id'] ?>" <?= ($service_id == $service['id']) ? 'selected' : '' ?>>
-						<?= $service_string ?>
-					</option>
-				<?php endforeach; ?>
-			</select>
+                    $service_string = implode(' - ', $service_details);
+                    ?>
+                    <option value="<?= $service['id'] ?>" <?= ($service_id == $service['id']) ? 'selected' : '' ?>>
+                        <?= $service_string ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
 
         </div>
 
@@ -140,7 +159,8 @@ $tableClass = (empty($service_date) && empty($service_id)) ? 'd-none' : '';
                         <input type="hidden" name="offerings[<?= $serialNo ?>][id]" class="row_id" />
                         <input type="hidden" name="offerings[<?= $serialNo ?>][serial_no]" class="serial_no" value="<?= $serialNo ?>" />
                         <div class="autocomplete-container">
-                            <input type="text" class="form-select autocomplete_member" name="offerings[<?= $serialNo ?>][autocomplete_member]" placeholder="Start typing...">
+                            <?php $general_special_ids = [22, 14, 24, 34, 44, 52, 53, 51, 50, 56]; ?>
+                            <input type="text" class="form-select autocomplete_member" name="offerings[<?= $serialNo ?>][autocomplete_member]" placeholder="Start typing..." value="<?= in_array($service_id, $general_special_ids) ? 'GENERAL-' : '' ?>">
                             <ul class="suggestions"></ul>
                         </div>
                     </td>
@@ -251,7 +271,22 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
         }
     });
 
+
     $(document).ready(function() {
+
+        $('#show-serial-checkbox').on('change', function() {
+            console.log('test')
+            let $targetInput = $(this).closest('.container-fluid').find('.serial_no');
+            if ($(this).is(':checked')) {
+                $targetInput.attr('type', 'text');
+            } else {
+                $targetInput.attr('type', 'hidden');
+            }
+        });
+
+        const $i = $('.autocomplete_member').first();
+        if ($i.length) $i.focus().val($i.val()); //set cursot in the first input 
+
         $('#short_coins_toggle').prop('checked', true).trigger('change'); //default checked 
         $('.toggle_checkbox').change(function() {
             if ($(this).is(':checked')) {
@@ -312,6 +347,17 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
                 suggestionsList.empty(); // Clear suggestions when the input is empty
             }
         }
+
+        $(document).on('keydown', '.form-control.denomination', function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault(); // prevent default form behavior
+                let $row = $(this).closest('tr');
+                let $button = $row.find('.edit-offering:visible, .add-offering:visible, .update-offering:visible').first();
+                if ($button.length) {
+                    $button.click();
+                }
+            }
+        });
 
         // Event listener for autocomplete keyup on newly added rows
         $(document).on('keyup', '.autocomplete_member', function(e) {
@@ -608,14 +654,25 @@ $default_service_date = empty($service_date) ? date('d/m/Y') : date('d/m/Y', str
 
             newRow.find('input').each(function() {
                 // console.log('dddddddfxxx', $(this).attr('name'));
-                const name = $(this).attr('name').replace('[1]', `[${rowCount}]`);
+                // const name = $(this).attr('name').replace('[1]', `[${rowCount}]`);
+                const name = $(this).attr('name').replace(/\[\d+\]/, `[${rowCount}]`);
                 $(this).attr('name', name);
             });
 
             newRow.find('.row-number').text(rowCount); // Set the row number based on rowCount
             newRow.find('.serial_no').val(rowCount);
 
+            /**if suggessson is not found add it **/
+            const autocompleteInput = newRow.find('.autocomplete_member');
+            if (autocompleteInput.next('.suggestions').length === 0) {
+                autocompleteInput.after('<ul class="suggestions"></ul>');
+            }
+            /**if suggessson is not found add it end**/
+
             $('#offerings-container').append(newRow);
+
+            autocompleteInput.focus(); //auto focus on the newly added row 
+
             rowCount++; // Increment the rowCount
 
             //smoothScrollAndHandleScroll('#offerings-container', 500);

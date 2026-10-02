@@ -9,7 +9,7 @@ class Service_model extends CI_Model {
         $this->db->join('languages', 'services.language_id = languages.id', 'left');
         $this->db->join('offering_types', 'services.offering_type_id = offering_types.id');
 		$this->db->where('services.status', 1); // Add this line
-        $this->db->order_by('services.id', 'ASC'); // Orders by 'id' in ascending order (ASC)
+        $this->db->order_by('services.order_by', 'ASC'); // Orders by 'id' in ascending order (ASC)
         return $this->db->get()->result_array();
     }
 
@@ -26,10 +26,14 @@ class Service_model extends CI_Model {
     }
 
     public function insert_service($data) {
+        $data['created_by'] = $this->session->userdata('user_id');
         return $this->db->insert('services', $data);
     }
 
     public function update_service($id, $data) {
+        $data['created_by'] = $this->session->userdata('user_id');
+        $data['created_by'] = $this->session->userdata('user_id');
+
         $this->db->where('id', $id);
         return $this->db->update('services', $data);
     }

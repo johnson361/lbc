@@ -6,12 +6,21 @@
             <input type="text" class="form-control" name="name" id="name" value="<?= $user['name']; ?>" required>
         </div>
         <div class="mb-3">
+            <label for="phone" class="form-label">Address</label>
+            <input type="tel" class="form-control" name="address" id="address"value="<?= $user['address']; ?>">
+        </div>
+        <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             <input type="text" class="form-control" name="email" id="email" value="<?= $user['email']; ?>" >
         </div>
         <div class="mb-3">
             <label for="phone" class="form-label">Phone Number</label>
             <input type="tel" class="form-control" name="phone" id="phone" maxlength="10" pattern="\d{10}" title="Please enter exactly 10 digits" value="<?= $user['phone']; ?>">
+        </div>
+
+        <div class="mb-3">
+            <label for="phone" class="form-label">Alternate Number </label>
+            <input type="tel" class="form-control" name="phone2" id="phone2" maxlength="10" pattern="\d{10}" title="Please enter exactly 10 digits" value="<?= $user['phone2']; ?>">
         </div>
         <button type="submit" class="btn btn-primary">Update</button>
     </form>

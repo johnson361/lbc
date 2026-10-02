@@ -8,6 +8,10 @@ class Services extends CI_Controller {
         $this->load->model('Service_model');
         $this->load->helper('url');
         $this->load->library('form_validation');
+
+        if (!$this->session->userdata('logged_in')) {
+            redirect('auth/login');
+        }
     }
 
     // public function index() {
@@ -16,6 +20,7 @@ class Services extends CI_Controller {
     // }
 
     public function index() {
+        // echo "sam";
         $data['page_content'] = 'services/index';
         $data['services'] = $this->Service_model->get_all_services();
         $this->load->view('layouts/navbar', $data);
@@ -37,6 +42,7 @@ class Services extends CI_Controller {
                     'language_id' => $this->input->post('language_id'),
                     'offering_type_id' => $this->input->post('offering_type_id'),
                     'service_slot' => $this->input->post('service_slot'),
+                    'created_by' => $this->session->userdata('user_id'),
                 );
 
                 $this->Service_model->insert_service($service_data);

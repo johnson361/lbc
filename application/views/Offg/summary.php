@@ -6,6 +6,10 @@ global $grouped_only_cheque;
 global $grouped_cheque_count;
 global $grouped_without_cheque;
 global $grouped_grand_total;
+
+
+global $grouped_cheque_rejected_count;
+global $grouped_cheque_rejected_sum;
 $grouped_data = '';
 function generateOfferingRows($grouped_services)
 {
@@ -80,9 +84,14 @@ function generateDenominationTable($total_check_amount = 0, $total_checks_count 
                 </thead>
                 <tbody>';
 
+    $HasCoin = false;
     foreach ($denominations as $denomination => $data) {
         if ($data['total'] == 0) {
             continue;  // Skip the current iteration and move to the next
+        }
+
+        if (!$HasCoin && stripos($denomination, 'Coins') !== false) {
+            $HasCoin = true;
         }
 
         $denom_value = (int)preg_replace('/\D/', '', $denomination);
@@ -96,28 +105,51 @@ function generateDenominationTable($total_check_amount = 0, $total_checks_count 
 
         $grandTotal += $amount;
     }
+
+
+
+    $cheque_text = '';
     if ($filter == 'include-check') {
-        $table .= "<tr>
+
+
+
+        $cheque_class =  '';
+        if ($total_check_amount > 0) {
+
+            if ($HasCoin) {
+                $table .= "<tr>
+                    <td><strong> Notes + Coins* </strong></td>
+                    <td></td>
+                    <td><strong>" . htmlspecialchars($grandTotal) . "</strong></td>
+                </tr>
+            </tbody>";
+            }
+
+            $cheque_class = 'is-check';
+            $cheque_text = "  With Cheque* ";
+            $table .= "<tr>
                         <td ><strong>Cheque Totals</strong></td>
                         <td><strong>{$total_checks_count}</strong></td>                        
-                        <td colspan='2' class='" . ($total_check_amount > 0 ? 'is-check' : '') . "'><strong>{$total_check_amount}</strong></td>
+                        <td colspan='2' class='" . $cheque_class . "'><strong>{$total_check_amount}</strong></td>
                     </tr>";
-        $grandTotal += $total_check_amount;
+            $grandTotal += $total_check_amount;
+        }
     }
 
     $table .= "<tr>
-                    <td><strong>Total</strong></td>
+                    <td><strong> Total $cheque_text </strong></td>
                     <td></td>
                     <td><strong>" . htmlspecialchars($grandTotal) . "</strong></td>
                 </tr>
             </tbody>
         </table>";
 
+    if (empty($grandTotal)) return '-';
     return $table;
 }
 
 
-function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_checks_count = 0, $grand_total_2000 = 0, $grand_total_500 = 0, $grand_total_200 = 0, $grand_total_100 = 0, $grand_total_50 = 0, $grand_total_20_notes = 0, $grand_total_20_coins = 0, $grand_total_10_notes = 0, $grand_total_10_coins = 0, $grand_total_5_notes = 0, $grand_total_5_coins = 0, $grand_total_2_notes = 0, $grand_total_2_coins = 0, $grand_total_1_notes = 0, $grand_total_1_coins = 0, $grand_total_amount = 0, $filter = null)
+function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_checks_count = 0,  $grand_total_cheque_rejected_count = 0, $grand_total_cheque_rejected_sum = 0, $grand_total_2000 = 0, $grand_total_500 = 0, $grand_total_200 = 0, $grand_total_100 = 0, $grand_total_50 = 0, $grand_total_20_notes = 0, $grand_total_20_coins = 0, $grand_total_10_notes = 0, $grand_total_10_coins = 0, $grand_total_5_notes = 0, $grand_total_5_coins = 0, $grand_total_2_notes = 0, $grand_total_2_coins = 0, $grand_total_1_notes = 0, $grand_total_1_coins = 0, $grand_total_amount = 0, $filter = null)
 {
 
     $denominations = [
@@ -227,18 +259,27 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
 
     $include_check_total = '';
     if ($filter == 'include-check') {
-        $include_check_total = 'With Cheques';
+        $include_check_total = 'With Cheques*';
         global $grouped_only_cheque;
         global $grouped_without_cheque;
         global $grouped_cheque_count;
+        global $grouped_cheque_rejected_count;
+        global $grouped_cheque_rejected_sum;
+
+
         $grouped_cheque_count = $grand_total_checks_count;
         $grouped_only_cheque = $grand_total_check_amount;
         $grouped_without_cheque = $grand_total_amount;
+
+        $grouped_cheque_rejected_count = $grand_total_cheque_rejected_count;
+        $grouped_cheque_rejected_sum = $grand_total_cheque_rejected_sum;
+
         $table_del .= "<tr>
                         <td ><strong>Cheque Totals</strong></td>
                         <td><strong>{$grand_total_checks_count}</strong></td>                        
                         <td colspan='2'><strong>{$grand_total_check_amount}</strong></td>
                     </tr>";
+
         $table_del .= "<tr>
                     <td ><strong>Without Cheques Total</strong></td>                       
                     <td colspan='2'><strong>{$grand_total_amount}</strong></td>
@@ -257,6 +298,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
     }
 
     $table .= '</tbody></table>';
+
     return $table;
 }
 ?>
@@ -271,6 +313,8 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
     <?php
     // Initialize grand totals for all services
     $grand_total_checks_count = 0;
+    $grand_total_cheque_rejected_count = 0;
+    $grand_total_cheque_rejected_sum = 0;
     $grand_total_check_amount = 0;
     $grand_total_2000 = 0;
     $grand_total_500 = 0;
@@ -358,6 +402,10 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                         //exit;
                         foreach ($item['details'] as $detail):
                             $is_check_class = ($detail['check_amount'] > 0) ? 'is-check' : '';
+
+                            if (!empty($detail['cheque_rejected']) && $detail['cheque_rejected'] == 1) {
+                                $is_check_class .= ' is-rejected-check';
+                            }
                         ?>
                             <tr>
                                 <td class="text-end  <?php echo $is_check_class; ?>"><span><?= htmlspecialchars($detail['serial_no']) ?></span></td>
@@ -441,6 +489,9 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
 
                             // Add to grand totals
                             $grand_total_checks_count += ($detail['check_amount'] > 0) ? 1 : 0;
+                            $grand_total_cheque_rejected_count += ($detail['cheque_rejected'] > 0) ? 1 : 0;
+                            $grand_total_cheque_rejected_sum += $row_bounce_amount = ($detail['cheque_rejected'] > 0) ? $detail['check_amount'] : 0;
+
                             $grand_total_check_amount += $detail['check_amount'];
                             $grand_total_2000 += $detail['denomination_2000'];
                             $grand_total_500 += $detail['denomination_500'];
@@ -482,6 +533,37 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                             <td class="text-end very-rare-notes"><span class="<?= $total_1_notes == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_1_notes) ?></strong></span></td>
                             <td class="text-end"><span class="<?= $total_1_coins == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_1_coins) ?></strong></span></td>
                             <td class="text-end <?= $total_check_amount > 0 ? 'is-check' : '' ?>"><span class="<?= $total_check_amount == 0 ? 'd-none' : '' ?>"><strong><?= htmlspecialchars($total_check_amount) ?></strong></span></td>
+
+
+                            <?php
+                            $including_check_total = $total_check_amount + $total_amount;
+                            ?>
+                            <td class="text-end">
+                                CASH
+                                <span class="<?= $total_amount == 0 ? 'd-none' : '' ?>">
+                                    <strong>
+                                        <?= htmlspecialchars($total_amount) ?>
+                                        <br>
+                                        <?php if ($total_check_amount > 0): ?>
+                                            <span class="is-check">
+                                                Including CHQ: <?= htmlspecialchars($including_check_total) ?>
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="text-muted">No cheque</span>
+                                        <?php endif; ?>
+                                    </strong>
+                                </span>
+                            </td>
+                            <?php
+                            $final_summary_services[] = array(
+                                'service_name' => $service_name,
+                                'total_amount' => htmlspecialchars($including_check_total),
+                                'offering_type_id' => $detail['offering_type_id'],
+                                'row_bounce_amount' => $row_bounce_amount ?? 0
+                            );
+                            ?>
+
+                            <?php  /* 
                             <td class="text-end">CASH<span class="<?= $total_amount == 0 ? 'd-none' : '' ?>"><strong>
                                         <?= htmlspecialchars($total_amount) ?> <br><span class="<?= $total_check_amount > 0 ? 'is-check' : '' ?>"> Including CHQ :
                                             <?php $including_check_total =  htmlspecialchars($total_check_amount + $total_amount);
@@ -494,6 +576,7 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                                             );
                                             ?>
                                     </strong></span></span></td>
+                                 */ ?>
                         </tr>
                     </tfoot>
                 </table>
@@ -531,17 +614,17 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
     <div class="row">
         <div class="col-md-4">
             <?php
-            echo generateGrandTotalTable($grand_total_check_amount, $grand_total_checks_count, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'all-coins');
+            echo generateGrandTotalTable($grand_total_check_amount, $grand_total_checks_count, $grand_total_cheque_rejected_count, $grand_total_cheque_rejected_sum, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'all-coins');
             ?>
         </div>
         <div class="col-md-4">
             <?php
-            echo generateGrandTotalTable($grand_total_check_amount, $grand_total_checks_count, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'all-notes');
+            echo generateGrandTotalTable($grand_total_check_amount, $grand_total_checks_count, $grand_total_cheque_rejected_count, $grand_total_cheque_rejected_sum, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'all-notes');
             ?>
         </div>
         <div class="col-md-4">
             <?php
-            echo generateGrandTotalTable($grand_total_check_amount, $grand_total_checks_count, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount);
+            echo generateGrandTotalTable($grand_total_check_amount, $grand_total_checks_count, $grand_total_cheque_rejected_count, $grand_total_cheque_rejected_sum, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount);
             ?>
         </div>
     </div>
@@ -571,8 +654,19 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                         <tr>
                             <td><?php echo $i++; ?></td>
                             <td><?php echo $service['service_name']; ?></td>
-                            <td class="text-end"><?php echo $service['total_amount']; ?></td>
-                            <!-- <td><?php echo $service['offering_type_id']; ?></td> -->
+                            <td class="text-end">
+                                <?php
+                                if (!empty($service['row_bounce_amount']) && $service['row_bounce_amount'] > 0) {
+                                    echo $service['total_amount'] . ' - ' . $service['row_bounce_amount'] . ' = ' . ($service['total_amount'] - $service['row_bounce_amount']);
+                                } else {
+                                    echo $service['total_amount'];
+                                }
+                                ?>
+                            </td>
+                            <!-- <td class="text-end"><?php //echo $service['total_amount']; 
+                                                        ?></td> -->
+                            <!-- <td><?php //echo $service['offering_type_id']; 
+                                        ?></td> -->
                         </tr>
                     <?php } ?>
 
@@ -612,11 +706,11 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
             </table>
         </div>
 
-        <div class="col-md-4">
-            <?php
-            echo generateGrandTotalTable($grand_total_check_amount, $grand_total_checks_count, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'include-check');
-            ?>
-        </div>
+        <!-- <div class="col-md-4"> -->
+        <?php
+        generateGrandTotalTable($grand_total_check_amount, $grand_total_checks_count, $grand_total_cheque_rejected_count, $grand_total_cheque_rejected_sum, $grand_total_2000, $grand_total_500, $grand_total_200, $grand_total_100, $grand_total_50, $grand_total_20_notes, $grand_total_20_coins, $grand_total_10_notes, $grand_total_10_coins, $grand_total_5_notes, $grand_total_5_coins, $grand_total_2_notes, $grand_total_2_coins, $grand_total_1_notes, $grand_total_1_coins, $grand_total_amount, 'include-check');
+        ?>
+        <!-- </div> -->
         <div class="col-md-4">
             <table class="table table-bordered  table-striped table-hover">
                 <thead>
@@ -627,7 +721,11 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                     </tr>
                 </thead>
                 <tbody>
-                    <?php echo generateOfferingRows($grouped_services); ?>
+                    <tr>
+                        <td>Notes</td>
+                        <td colspan="2" class="text-end"><?php echo $grouped_notes; ?></td>
+                    </tr>
+
                     <?php if ($grouped_coins > 0) { ?>
                         <tr>
                             <td>Coins</td>
@@ -635,34 +733,53 @@ function generateGrandTotalTable($grand_total_check_amount = 0,  $grand_total_ch
                         </tr>
                     <?php } ?>
 
-                    <tr>
-                        <td>Notes</td>
-                        <td colspan="2" class="text-end"><?php echo $grouped_notes; ?></td>
-                    </tr>
+                    <?php echo generateOfferingRows($grouped_services); ?>
 
-                    <tr>
-                        <td>Notes + Coins</td>
-                        <td colspan="2" class="text-end"><?php echo $grouped_without_cheque; ?></td>
-                    </tr>
+                    <?php if ($grouped_only_cheque > 0) { ?>
+                        <tr>
+                            <td>Cheque</td>
+                            <td class="text-end"><?php echo $grouped_cheque_count; ?></td>
+                            <td class="text-end">
+                                <?php
+                                echo ($grouped_cheque_rejected_sum > 0)
+                                    ? $grouped_only_cheque . ' - ' . $grouped_cheque_rejected_sum . ' = ' . ($grouped_only_cheque - $grouped_cheque_rejected_sum)
+                                    : $grouped_only_cheque;
+                                ?>
+                            </td>
+                        </tr>
+                    <?php } ?>
 
-                    <?php if ($grouped_without_cheque > 0) { ?>
+                    <?php if ($grouped_cheque_rejected_count > 0) { ?>
+                        <tr>
+                            <td class="is-rejected-check">Cheque Bounce</td>
+                            <td class="text-end"> <?php echo $grouped_cheque_rejected_count ?></td>
+                            <td class="text-end"><?php echo $grouped_cheque_rejected_sum; ?></td>
+                        </tr>
+                    <?php } ?>
+
+                    <?php 
+                    $with_cheque_name = "Final  ";
+                    if ($grouped_cheque_count > 0) { 
+                        $with_cheque_name = " With Cheques ";
+                        ?>
                         <tr>
                             <td>Without Cheques Grand Total</td>
                             <td colspan="2" class="text-end"><?php echo $grouped_without_cheque; ?></td>
                         </tr>
                     <?php } ?>
-                    <?php if ($grouped_only_cheque > 0) { ?>
-                        <tr>
-                            <td>Cheque</td>
-                            <td class="text-end"> <?php echo $grouped_cheque_count ?></td>
-                            <td class="text-end"><?php echo $grouped_only_cheque; ?></td>
-                        </tr>
-                    <?php } ?>
+
 
                     <tr>
-                        <td>With Cheques Grand Total</td>
-                        <td colspan="2" class="text-end"><?php echo $grouped_grand_total; ?></td>
+                        <td><?php echo $with_cheque_name; ?> Grand Total</td>
+                        <td colspan="2" class="text-end">
+                            <?php
+                            echo ($grouped_cheque_rejected_sum > 0)
+                                ? $grouped_grand_total . ' - ' . $grouped_cheque_rejected_sum . ' = ' . ($grouped_grand_total - $grouped_cheque_rejected_sum)
+                                : $grouped_grand_total;
+                            ?>
+                        </td>
                     </tr>
+
                 </tbody>
             </table>
 

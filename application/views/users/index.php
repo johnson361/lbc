@@ -9,6 +9,7 @@
             <tr>
                 <th>ID</th>
                 <th>Name</th>
+                <th>Address</th>
                 <th>Email</th>
                 <th>Phone </th>
                 <th>Alt Phone </th>
@@ -20,6 +21,7 @@
                 <tr>
                     <td><?= $user['id'] ?></td>
                     <td><?= $user['name'] ?></td>
+                    <td><?= $user['address'] ?></td>
                     <td><?= $user['email'] ?></td>
                     <td><?= $user['phone'] ?></td>
                     <td><?= $user['phone2'] ?></td>

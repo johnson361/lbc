@@ -139,7 +139,11 @@
 }
 
 .is-check {
-    background-color: #34a88a !important;
+    background-color: green !important;
+}
+
+.is-rejected-check {
+    background-color: red !important;
 }
 
 .row>* {

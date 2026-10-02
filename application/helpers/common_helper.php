@@ -14,3 +14,12 @@ if (!function_exists('convertToMySQLDate')) {
         }
     }
 }
+
+if ( ! function_exists('number_format_india'))
+{
+    function number_format_india($number)
+    {
+        $number = (string)$number;
+        return preg_replace("/(\d+?)(?=(\d\d)+(\d)(?!\d))(\.\d+)?/i", "$1,", $number);
+    }
+}

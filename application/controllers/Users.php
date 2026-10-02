@@ -7,6 +7,9 @@ class Users extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+        if (!$this->session->userdata('logged_in')) {
+            redirect('auth/login');
+        }
         $this->load->model('User_model');
     }
 
@@ -46,6 +49,7 @@ class Users extends CI_Controller
             // Get form data
             $data = array(
                 'name'  => $this->input->post('name') ?? NULL,
+                'address' => $this->input->post('address') ??  NULL,
                 'email' => $this->input->post('email') ??  NULL,
                 'phone' => $this->input->post('phone') ?? NULL,
                 'phone2' => $this->input->post('phone2') ?? NULL,

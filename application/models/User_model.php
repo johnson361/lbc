@@ -17,12 +17,15 @@ class User_model extends CI_Model
     // Insert a new user
     public function create_user($data)
     {
+        $data['created_by'] = $this->session->userdata('user_id');
         return $this->db->insert('users', $data);
     }
 
     // Update an existing user
     public function update_user($id, $data)
     {
+
+        $data['created_by'] = $this->session->userdata('user_id');
         return $this->db->update('users', $data, ['id' => $id]);
     }
 
@@ -67,7 +70,7 @@ class User_model extends CI_Model
             'name' => $name,
             'phone' => !empty($phone) ? $phone : null,
         ];
-
+        $data['created_by'] = $this->session->userdata('user_id');
         if ($this->db->insert('users', $data)) {
             return $this->db->insert_id();
         }

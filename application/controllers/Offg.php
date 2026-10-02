@@ -10,7 +10,10 @@ class Offg extends CI_Controller
         $this->load->model('Offering_model');
         $this->load->model('Service_model');
         $this->load->model('User_model');
-        $this->load->helper('common');
+
+        if (!$this->session->userdata('logged_in')) {
+            redirect('auth/login');
+        }
     }
 
     public function index($serviceId = 0, $serviceDate = '')
