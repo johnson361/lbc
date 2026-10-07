@@ -85,24 +85,26 @@ class Offering_model extends CI_Model
         return $query->result_array();
     }
 
-    public function get_last_30_days_service_dates()
+    public function get_last_30_days_service_dates($channel_label)
     {
         $sql = "
-        SELECT DISTINCT service_date
-        FROM offerings
-        WHERE service_id IN (11, 13, 21, 23, 31, 33, 41, 43)
-        AND service_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)  -- last 30 days
-            AND service_date NOT IN (
-            SELECT DISTINCT service_date
-            FROM offering_messages
-            WHERE service_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
-            )
-        ORDER BY service_date DESC
-    ";
-        return $this->db->query($sql)->result_array();
+            SELECT DISTINCT offerings.service_date
+            FROM offerings
+            WHERE offerings.service_id IN (11, 13, 21, 23, 31, 33, 41, 43)
+              AND offerings.service_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM offering_messages
+                  WHERE offering_messages.service_date = offerings.service_date
+                    AND offering_messages.channel_label = ?
+                    AND FIND_IN_SET(offerings.id, offering_messages.offering_ids) > 0
+              )
+            ORDER BY offerings.service_date DESC
+        ";
+        return $this->db->query($sql, [$channel_label])->result_array();
     }
 
-    public function get_offerings_by_date($service_date)
+    public function get_offerings_by_date($service_date, $channel_label)
     {
         $sql = "
             SELECT 
@@ -127,14 +129,21 @@ class Offering_model extends CI_Model
               AND users.phone IS NOT NULL 
               AND users.phone != '' 
               AND offerings.service_id IN (11, 13, 21, 23, 31, 33, 41, 43)
+              AND NOT EXISTS (
+                  SELECT 1
+                  FROM offering_messages
+                  WHERE offering_messages.service_date = offerings.service_date
+                    AND offering_messages.channel_label = ?
+                    AND FIND_IN_SET(offerings.id, offering_messages.offering_ids) > 0
+              )
             group by users.id , offerings.service_id
 			ORDER BY languages.language_name;
         ";
 
-        return $this->db->query($sql, [$service_date])->result_array();
+        return $this->db->query($sql, [$service_date, $channel_label])->result_array();
     }
 
-    public function log_message($offering_ids, $user_id, $service_date, $phone, $message_text, $api_response, $amount)
+    public function log_message($offering_ids, $user_id, $service_date, $phone, $message_text, $api_response, $amount, $channel_label)
     {
         $data = [
             'offering_ids'  => $offering_ids,
@@ -144,6 +153,7 @@ class Offering_model extends CI_Model
             'message_text' => $message_text,
             'api_response' => $api_response,
             'amount' => $amount,
+            'channel_label' => $channel_label,
             'created_by' => $this->session->userdata('user_id')
         ];
 
